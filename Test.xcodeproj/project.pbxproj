@@ -12,15 +12,16 @@
 		520F385321228F100081B956 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 520F385121228F100081B956 /* Main.storyboard */; };
 		520F385521228F110081B956 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 520F385421228F110081B956 /* Assets.xcassets */; };
 		520F385821228F110081B956 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 520F385621228F110081B956 /* LaunchScreen.storyboard */; };
-		520F386521228F930081B956 /* PKHParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F386421228F930081B956 /* PKHParser.swift */; };
-		520F3867212290100081B956 /* NSObjectExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F3866212290100081B956 /* NSObjectExtensions.swift */; };
-		520F38692122903C0081B956 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F38682122903C0081B956 /* StringExtensions.swift */; };
 		520F3871212292B40081B956 /* TestImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F386B212292B30081B956 /* TestImage.swift */; };
 		520F3872212292B40081B956 /* TestText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F386C212292B30081B956 /* TestText.swift */; };
 		520F3873212292B40081B956 /* Widget.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F386D212292B30081B956 /* Widget.swift */; };
 		520F3874212292B40081B956 /* Test.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F386E212292B40081B956 /* Test.swift */; };
 		520F3875212292B40081B956 /* WindowsDataListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F386F212292B40081B956 /* WindowsDataListItem.swift */; };
 		520F3876212292B40081B956 /* WindowT.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F3870212292B40081B956 /* WindowT.swift */; };
+		520F38852122999B0081B956 /* NSObjectExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F38822122999B0081B956 /* NSObjectExtensions.swift */; };
+		520F38862122999B0081B956 /* PKHParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F38832122999B0081B956 /* PKHParser.swift */; };
+		520F38872122999B0081B956 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 520F38842122999B0081B956 /* StringExtensions.swift */; };
+		520F3889212299A10081B956 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 520F3888212299A10081B956 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -31,15 +32,16 @@
 		520F385421228F110081B956 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		520F385721228F110081B956 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		520F385921228F110081B956 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		520F386421228F930081B956 /* PKHParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PKHParser.swift; sourceTree = "<group>"; };
-		520F3866212290100081B956 /* NSObjectExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSObjectExtensions.swift; sourceTree = "<group>"; };
-		520F38682122903C0081B956 /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		520F386B212292B30081B956 /* TestImage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestImage.swift; sourceTree = "<group>"; };
 		520F386C212292B30081B956 /* TestText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestText.swift; sourceTree = "<group>"; };
 		520F386D212292B30081B956 /* Widget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
 		520F386E212292B40081B956 /* Test.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Test.swift; sourceTree = "<group>"; };
 		520F386F212292B40081B956 /* WindowsDataListItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowsDataListItem.swift; sourceTree = "<group>"; };
 		520F3870212292B40081B956 /* WindowT.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowT.swift; sourceTree = "<group>"; };
+		520F38822122999B0081B956 /* NSObjectExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSObjectExtensions.swift; sourceTree = "<group>"; };
+		520F38832122999B0081B956 /* PKHParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PKHParser.swift; sourceTree = "<group>"; };
+		520F38842122999B0081B956 /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		520F3888212299A10081B956 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -56,6 +58,8 @@
 		520F384121228F100081B956 = {
 			isa = PBXGroup;
 			children = (
+				520F3888212299A10081B956 /* README.md */,
+				520F38812122999B0081B956 /* Class */,
 				520F384C21228F100081B956 /* Test */,
 				520F384B21228F100081B956 /* Products */,
 			);
@@ -73,7 +77,6 @@
 			isa = PBXGroup;
 			children = (
 				520F386A212292A20081B956 /* TestClass */,
-				520F386121228F440081B956 /* Class */,
 				520F384D21228F100081B956 /* AppDelegate.swift */,
 				520F384F21228F100081B956 /* ViewController.swift */,
 				520F385121228F100081B956 /* Main.storyboard */,
@@ -82,16 +85,6 @@
 				520F385921228F110081B956 /* Info.plist */,
 			);
 			path = Test;
-			sourceTree = "<group>";
-		};
-		520F386121228F440081B956 /* Class */ = {
-			isa = PBXGroup;
-			children = (
-				520F3866212290100081B956 /* NSObjectExtensions.swift */,
-				520F386421228F930081B956 /* PKHParser.swift */,
-				520F38682122903C0081B956 /* StringExtensions.swift */,
-			);
-			path = Class;
 			sourceTree = "<group>";
 		};
 		520F386A212292A20081B956 /* TestClass */ = {
@@ -105,6 +98,16 @@
 				520F3870212292B40081B956 /* WindowT.swift */,
 			);
 			path = TestClass;
+			sourceTree = "<group>";
+		};
+		520F38812122999B0081B956 /* Class */ = {
+			isa = PBXGroup;
+			children = (
+				520F38832122999B0081B956 /* PKHParser.swift */,
+				520F38822122999B0081B956 /* NSObjectExtensions.swift */,
+				520F38842122999B0081B956 /* StringExtensions.swift */,
+			);
+			path = Class;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -167,6 +170,7 @@
 			files = (
 				520F385821228F110081B956 /* LaunchScreen.storyboard in Resources */,
 				520F385521228F110081B956 /* Assets.xcassets in Resources */,
+				520F3889212299A10081B956 /* README.md in Resources */,
 				520F385321228F100081B956 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -181,13 +185,13 @@
 				520F385021228F100081B956 /* ViewController.swift in Sources */,
 				520F3871212292B40081B956 /* TestImage.swift in Sources */,
 				520F3874212292B40081B956 /* Test.swift in Sources */,
-				520F386521228F930081B956 /* PKHParser.swift in Sources */,
 				520F3873212292B40081B956 /* Widget.swift in Sources */,
-				520F38692122903C0081B956 /* StringExtensions.swift in Sources */,
 				520F3875212292B40081B956 /* WindowsDataListItem.swift in Sources */,
+				520F38852122999B0081B956 /* NSObjectExtensions.swift in Sources */,
+				520F38872122999B0081B956 /* StringExtensions.swift in Sources */,
 				520F384E21228F100081B956 /* AppDelegate.swift in Sources */,
-				520F3867212290100081B956 /* NSObjectExtensions.swift in Sources */,
 				520F3876212292B40081B956 /* WindowT.swift in Sources */,
+				520F38862122999B0081B956 /* PKHParser.swift in Sources */,
 				520F3872212292B40081B956 /* TestText.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
