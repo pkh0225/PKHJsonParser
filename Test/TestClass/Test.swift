@@ -19,12 +19,24 @@ class Test : PKHParser {
     var alignment: String = ""
     var name: String = ""
 
-
     // json key ans ivar Different
     override func getDataMap() -> [ParserMap]? {
         return [ParserMap(ivar: "windowsList", jsonKey: "windowsDataList"),
                 ParserMap(ivar: "widgetData", jsonKey: "widget")]
     }
 
+    override func beforeParsed(dic: [String : Any], anyData: Any?) {
+        super.beforeParsed(dic: dic, anyData: anyData)
+        
+        // Parsering before
+        
+    }
+    
+    override func afterParsed(_ dic: [String : Any]) {
+        super.afterParsed(dic)
+        
+        // Parsering after
+        
+    }
 }
 
