@@ -70,6 +70,69 @@ let jsonString = """
         let obj = Test(map: dic)
         print(obj)
 
+
+🎃 RESULT
+======== Test ========
+	windowsList: ---- Array(3) ----
+	[0] ======== WindowsDataListItem ========
+		name: main_window
+		title: Sample Konfabulator Widget
+		height: 500
+		width: 500
+		=======================================
+	[1] ======== WindowsDataListItem ========
+		name: main_window
+		title: Sample Konfabulator Widget
+		height: 500
+		width: 500
+		=======================================
+	[2] ======== WindowsDataListItem ========
+		name: main_window
+		title: Sample Konfabulator Widget
+		height: 500
+		width: 500
+		=======================================
+	---------------------------
+	widgetData: ======== Widget ========
+		stringArray: ---- Array(3) ----
+		[0] a
+		[1] b
+		[2] c
+		---------------------------
+		windowT: ======== WindowT ========
+			name: main_window
+			title: Sample Konfabulator Widget
+			height: 500
+			width: 500
+			=======================================
+		testImage: ======== TestImage ========
+			alignment: center
+			name: sun1
+			src: Images/Sun.png
+			hOffset: 250
+			vOffset: 250
+			=======================================
+		testText: ======== TestText ========
+			name: text1
+			data: Click Here
+			onMouseUp: sun1.opacity = (sun1.opacity / 100) * 90;
+			alignment: center
+			size: 36
+			style: bold
+			hOffset: 250
+			vOffset: 100
+			=======================================
+		testDebug: on
+		=======================================
+	onMouseUp: sun1.opacity = (sun1.opacity / 100) * 90;
+	name: text1
+	alignment: center
+	size: 36
+	style: bold
+	hOffset: 250
+	vOffset: 100
+	=======================================
+
 ```
 
 ## Core Functions
