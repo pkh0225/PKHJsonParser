@@ -6,7 +6,64 @@
 
 
 
-
+let jsonString = """
+{"widget": {
+    "testDebug": "on",
+     "stringArray": ["a","b","c"],
+    "windowT": {
+        "title": "Sample Konfabulator Widget",
+        "name": "main_window",
+        "width": 500,
+        "height": 500
+    },
+    "testImage": {
+        "src": "Images/Sun.png",
+        "name": "sun1",
+        "hOffset": 250,
+        "vOffset": 250,
+        "alignment": "center"
+    },
+    "testText": {
+        "data": "Click Here",
+        "size": 36,
+        "style": "bold",
+        "name": "text1",
+        "hOffset": 250,
+        "vOffset": 100,
+        "alignment": "center",
+        "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+    }
+},
+"windowsDataList": [{
+        "title": "Sample Konfabulator Widget",
+        "name": "main_window",
+        "width": 500,
+        "height": 500
+    },
+    {
+        "title": "Sample Konfabulator Widget",
+        "name": "main_window",
+        "width": 500,
+        "height": 500
+    },
+    {
+        "title": "Sample Konfabulator Widget",
+        "name": "main_window",
+        "width": 500,
+        "height": 500
+    }],
+"size": 36,
+"style": "bold",
+"name": "text1",
+"hOffset": 250,
+"vOffset": 100,
+"alignment": "center",
+"onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+}
+"""
+        let dic = jsonString.toDictionary()
+        let obj = Test(map: dic)
+        print(obj)
 
 <br>
 
