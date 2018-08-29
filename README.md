@@ -69,7 +69,10 @@ let jsonString = """
         let dic = jsonString.toDictionary()
         let obj = Test(map: dic)
         print(obj)
-
+        
+        Test.parser(map: dic!) { (obj: Test) in
+        print(obj)
+        }
 
 🎃 RESULT
 ======== Test ========
