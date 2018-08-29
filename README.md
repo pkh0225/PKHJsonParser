@@ -71,7 +71,7 @@ let jsonString = """
         print(obj)
         
         Test.parser(map: dic!) { (obj: Test) in
-        print(obj)
+            print(obj)
         }
 
 🎃 RESULT
