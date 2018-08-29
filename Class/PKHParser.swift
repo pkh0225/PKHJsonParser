@@ -27,12 +27,24 @@ public struct ParserMap {
     }
 }
 
+let PKHParser_label = "PKHParser_label"
 @objcMembers open class PKHParser: NSObject {
     
     private var _descriptionTab: String = "\t"
     
     public override init() {
         super.init()
+    }
+   
+    public class func parser<T:PKHParser>(map dic : [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping (T) -> Void) {
+        guard let dic = dic else { return }
+        DispatchQueue(label: PKHParser_label).async {
+            let obj = T.init(map: dic, anyData: anyData, serializeKey: serializeKey)
+            DispatchQueue.main.async(execute: {
+                completionHandler(obj)
+            })
+        }
+        
     }
     
     required public init(map dic: [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil) {
