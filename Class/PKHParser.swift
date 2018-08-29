@@ -182,7 +182,7 @@ let PKHParser_label = "PKHParser_label"
                             result.append("[\(idx)] \(objClass.description)")
                         }
                         else {
-                            result.append("[\(idx)] \(self.className) ????????")
+                            result.append("[\(idx)] \(String(describing: type(of: value))) ????????")
                             //                                fatalError("\(String(describing: value)) not NSObject" )
                         }
                     }
@@ -201,7 +201,7 @@ let PKHParser_label = "PKHParser_label"
                     result.append("\(key): \(objClass.description)")
                 }
                 else {
-                    result.append("\(key): \(self.className) ????????")
+                    result.append("\(key): \(String(describing: type(of: value))) ????????")
                     //                        fatalError("\(String(describing: value)) not NSObject" )
                 }
             }
