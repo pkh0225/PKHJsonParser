@@ -73,7 +73,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 }
 """
         let dic = jsonString.toDictionary()
-        let obj = Test(map: dic)
+        let obj = Test(map: dic!)
         print(obj)
         
         Test.parser(map: dic!) { (obj: Test) in

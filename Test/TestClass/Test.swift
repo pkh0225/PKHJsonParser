@@ -32,8 +32,8 @@ class Test : PKHParser {
         
     }
     
-    override func afterParsed(_ dic: [String : Any]) {
-        super.afterParsed(dic)
+    override func afterParsed(_ dic: [String : Any], anyData: Any?) {
+        super.afterParsed(dic, anyData: anyData)
         
         // Parsering after
         

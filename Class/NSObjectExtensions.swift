@@ -7,12 +7,46 @@
 //
 
 import Foundation
+import UIKit
 
-private var Object_class_Name_Key : UInt8 = 0
-private var Object_iVar_Name_Key : UInt8 = 0
-private var Object_iVar_Value_Key : UInt8 = 0
+public class ObjectInfoMap {
+    public var dictionary = [String: [IvarInfo]]()
+    public let accessQueue = DispatchQueue(label: "queue_ObjectInfoMap", qos: .userInitiated, attributes: .concurrent)
+    
+    @inline(__always) public func object(withID id: String) -> [IvarInfo]? {
+        var result:  [IvarInfo]? = nil
+        accessQueue.sync() {
+            result = self.dictionary[id]
+        }
+        return result
+    }
+    
+    @inline(__always) public func addObject(id: String, object: [IvarInfo]) {
+        if self.dictionary[id] == nil {
+            accessQueue.async(flags: .barrier) {
+                //                print("check 2222: \(id)")
+                self.dictionary[id] = object
+            }
+        }
+    }
+}
 
-public var Object_Info_Dic = [String: [IvarInfo]]()
+
+public var Object_Info_Dic = ObjectInfoMap()
+
+//let valueTypesMap: Dictionary<String, Any> = [
+//    "c" : Int8.self,
+//    "s" : Int16.self,
+//    "i" : Int32.self,
+//    "q" : Int.self, //also: Int64, NSInteger, only true on 64 bit platforms
+//    "S" : UInt16.self,
+//    "I" : UInt32.self,
+//    "Q" : UInt.self, //also UInt64, only true on 64 bit platforms
+//    "B" : Bool.self,
+//    "d" : Double.self,
+//    "f" : Float.self,
+//    "{" : Decimal.self
+//]
 
 
 @inline(__always) public func swiftClassFromString(_ className: String, bundleName: String = "") -> AnyClass? {
@@ -24,7 +58,7 @@ public var Object_Info_Dic = [String: [IvarInfo]]()
         guard let aClass = NSClassFromString(classStringName) else {
             let classStringName = "\(bundleName).\(className)"
             guard let aClass = NSClassFromString(classStringName) else {
-//                print(">>>>>>>>>>>>> [ \(className) ] : swiftClassFromString Create Fail <<<<<<<<<<<<<<")
+                //                print(">>>>>>>>>>>>> [ \(className) ] : swiftClassFromString Create Fail <<<<<<<<<<<<<<")
                 return nil
                 
             }
@@ -32,7 +66,7 @@ public var Object_Info_Dic = [String: [IvarInfo]]()
         }
         return aClass
     }
-//    print(">>>>>>>>>>>>> [ \(className) ] : swiftClassFromString Create Fail <<<<<<<<<<<<<<")
+    //    print(">>>>>>>>>>>>> [ \(className) ] : swiftClassFromString Create Fail <<<<<<<<<<<<<<")
     return nil
 }
 
@@ -45,6 +79,8 @@ public struct  IvarInfo {
         case int
         case string
         case float
+        case cgfloat
+        case double
         case bool
     }
     
@@ -59,6 +95,19 @@ public struct  IvarInfo {
     }
 }
 
+
+@inline(__always) public func getDictionaryExcludSuper(mirrored_object: Mirror) -> [String: Any] {
+    var dict = [String: Any]()
+    for (label, value) in mirrored_object.children {
+        guard let label = label else { continue }
+        if label == "_descriptionTab" {
+            continue
+        }
+        dict[label] = value as AnyObject
+    }
+    
+    return dict
+}
 
 
 @inline(__always) public func getDictionary(mirrored_object: Mirror) -> [String: Any] {
@@ -80,6 +129,9 @@ public struct  IvarInfo {
     return dict
 }
 
+
+
+
 @inline(__always) public func getIvarInfoList(_ classType: NSObject.Type) -> [IvarInfo] {
     
     
@@ -88,7 +140,7 @@ public struct  IvarInfo {
     ivarDataList.reserveCapacity(mirror.children.count)
     
     for case let (label?, value) in mirror.children {
-//        print("label: \(label), class: \(self.className) value: \(value)")
+        //        print("label: \(label), class: \(classType.className) value: \(value)")
         if label == "_descriptionTab" {
             continue
         }
@@ -119,11 +171,25 @@ public struct  IvarInfo {
             else if value is Float {
                 ivarDataList.append( IvarInfo(label: label, classType: .float, subClassType: nil, value: nil) )
             }
+            else if value is CGFloat {
+                ivarDataList.append( IvarInfo(label: label, classType: .cgfloat, subClassType: nil, value: nil) )
+            }
+            else if value is Double {
+                ivarDataList.append( IvarInfo(label: label, classType: .double, subClassType: nil, value: nil) )
+            }
             else if value is Bool {
                 ivarDataList.append( IvarInfo(label: label, classType: .bool, subClassType: nil, value: nil) )
             }
             else {
-                ivarDataList.append( IvarInfo(label: label, classType: .any, subClassType: nil, value: nil) )
+                //                print("getIvarInfoList etc >>>> label: \(label), className: \(className), \(String(describing: Mirror(reflecting: value).displayStyle))")
+                if (Mirror(reflecting: value).displayStyle == .class) {
+                    ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className), value: nil) )
+                }
+                else if (Mirror(reflecting: value).displayStyle != .`enum`) {
+                    ivarDataList.append( IvarInfo(label: label, classType: .any, subClassType: nil, value: nil) )
+                }
+                
+                
             }
             
             
@@ -144,56 +210,67 @@ public struct  IvarInfo {
     return ivarDataList
 }
 
-
 extension NSObject {
     
-    @inline(__always) public func ivarToDictionary() -> [String: Any] {
+    @inline(__always) public func toDictionary() -> [String: Any] {
         let mirrored_object = Mirror(reflecting: self)
         return getDictionary(mirrored_object:mirrored_object)
     }
     
+    @inline(__always) public func toDictionaryExcludeSuperClass() -> [String: Any] {
+        let mirrored_object = Mirror(reflecting: self)
+        return getDictionaryExcludSuper(mirrored_object:mirrored_object)
+    }
+    
     @inline(__always) public func ivarInfoList() -> [IvarInfo] {
-//        print(String(describing: type(of:self)))
-        if let info = Object_Info_Dic[self.className] {
+        //        print(String(describing: type(of:self)))
+        if let info = Object_Info_Dic.object(withID: self.className) {
             return info
         }
         else {
             let info = getIvarInfoList(type(of:self))
-            Object_Info_Dic[self.className] = info
+            Object_Info_Dic.addObject(id: self.className, object: info)
             return info
         }
-        
-        
-//        return getIvarInfoList(type(of:self))
+        //        return getIvarInfoList(type(of:self))
     }
 }
 
 extension NSObject {
+    private struct AssociatedKeys {
+        static var className: UInt8 = 0
+        static var iVarName: UInt8 = 0
+        static var iVarValue: UInt8 = 0
+    }
+    
+    public var toInt: Int {
+        return unsafeBitCast(self, to: Int.self)
+    }
     
     public var tag_name: String? {
         get {
-            return objc_getAssociatedObject(self, &Object_iVar_Name_Key) as? String
+            return objc_getAssociatedObject(self, &AssociatedKeys.iVarName) as? String
         }
         set {
-            objc_setAssociatedObject(self, &Object_iVar_Name_Key, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &AssociatedKeys.iVarName, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     public var tag_value: Any? {
         get {
-            return objc_getAssociatedObject(self, &Object_iVar_Value_Key)
+            return objc_getAssociatedObject(self, &AssociatedKeys.iVarValue)
         }
         set {
-            objc_setAssociatedObject(self, &Object_iVar_Value_Key, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &AssociatedKeys.iVarValue, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
         }
     }
     
     public var className: String {
-        if let name = objc_getAssociatedObject(self, &Object_class_Name_Key) as? String {
+        if let name = objc_getAssociatedObject(self, &AssociatedKeys.className) as? String {
             return name
         }
         else {
             let name = String(describing: type(of:self))
-            objc_setAssociatedObject(self, &Object_class_Name_Key, name, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            objc_setAssociatedObject(self, &AssociatedKeys.className, name, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return name
         }
         
@@ -201,12 +278,12 @@ extension NSObject {
     }
     
     public class var className: String {
-        if let name = objc_getAssociatedObject(self, &Object_class_Name_Key) as? String {
+        if let name = objc_getAssociatedObject(self, &AssociatedKeys.className) as? String {
             return name
         }
         else {
-            let name = NSStringFromClass(self).components(separatedBy: ".").last ?? ""
-            objc_setAssociatedObject(self, &Object_class_Name_Key, name, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+            let name = String(describing: self)
+            objc_setAssociatedObject(self, &AssociatedKeys.className, name, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
             return name
         }
     }

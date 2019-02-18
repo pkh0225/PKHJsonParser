@@ -27,7 +27,8 @@ public struct ParserMap {
     }
 }
 
-let PKHParser_label = "PKHParser_label"
+let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQueue", qos: .userInitiated, attributes: .concurrent)
+
 @objcMembers open class PKHParser: NSObject {
     
     private var _descriptionTab: String = "\t"
@@ -35,10 +36,14 @@ let PKHParser_label = "PKHParser_label"
     public override init() {
         super.init()
     }
-   
+    
+    //    public class func parser(map dic : [String: Any], anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping (ParserObject) -> Void) {
+    //        self.parser(map: dic, anyData: anyData, serializeKey: serializeKey, as: self, completionHandler: completionHandler)
+    //    }
+    
     public class func parser<T:PKHParser>(map dic : [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping (T) -> Void) {
         guard let dic = dic else { return }
-        DispatchQueue(label: PKHParser_label).async {
+        ParserObjectConcurrentQueue.async {
             let obj = T.init(map: dic, anyData: anyData, serializeKey: serializeKey)
             DispatchQueue.main.async(execute: {
                 completionHandler(obj)
@@ -47,17 +52,16 @@ let PKHParser_label = "PKHParser_label"
         
     }
     
-    required public init(map dic: [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil) {
+    required public init(map dic: [String: Any], anyData: Any? = nil, serializeKey: String? = nil) {
         super.init()
-        guard let dic = dic else { return }
         self.beforeParsed(dic:dic, anyData:anyData)
         if let key = serializeKey, let dataDic = dic[key] as? [String: Any] {
             self.setSerialize(map: dataDic, anyData: anyData)
-            self.afterParsed(dataDic)
+            self.afterParsed(dataDic, anyData: anyData)
         }
         else {
             self.setSerialize(map: dic, anyData: anyData)
-            self.afterParsed(dic)
+            self.afterParsed(dic, anyData: anyData)
         }
         
         
@@ -65,7 +69,7 @@ let PKHParser_label = "PKHParser_label"
     
     open func getDataMap() -> [ParserMap]? { return nil }
     open func beforeParsed(dic: [String: Any], anyData: Any?) {}
-    open func afterParsed(_ dic: [String: Any]) {}
+    open func afterParsed(_ dic: [String: Any], anyData: Any?) {}
     open func setSerialize(map dic: [String: Any], anyData: Any?) {
         
         let maps = self.getDataMap()
@@ -84,15 +88,14 @@ let PKHParser_label = "PKHParser_label"
             if parserMap != nil && parserMap!.jsonKey != "" {
                 changeKey = parserMap!.jsonKey
             }
-            
-//            print(changeKey)
+            //            print(changeKey)
             guard let value = dic[changeKey] else { continue }
             guard value is NSNull == false else { continue }
             
             if ivarItem.classType == .array {
                 guard let arrayValue = value as? [Any], arrayValue.count > 0 else { continue }
                 guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
-                    fatalError("self : [\(String(describing: self))] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
+                    assertionFailure("self : [\(self.className))] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
                     continue
                 }
                 var array: [Any] = []
@@ -108,10 +111,10 @@ let PKHParser_label = "PKHParser_label"
             }
             else if ivarItem.classType == .dictionary {
                 guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
-                    fatalError("self : [\(String(describing: self))] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
+                    assertionFailure("self : [\(self.className)] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
                     continue
                 }
-                if let dic = value as? [String:Any], dic.keys.count > 0 {
+                if let dic = value as? [String:Any], dic.isEmpty == false {
                     let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
                     self.setValue(addObj, forKey: ivarItem.label)
                 }
@@ -143,6 +146,24 @@ let PKHParser_label = "PKHParser_label"
                     self.setValue(text.toFloat(), forKey: ivarItem.label)
                 }
             }
+            else if ivarItem.classType == .cgfloat {
+                if value is Float {
+                    self.setValue(value, forKey: ivarItem.label)
+                }
+                else {
+                    let text = "\(value)"
+                    self.setValue(text.toCGFloat(), forKey: ivarItem.label)
+                }
+            }
+            else if ivarItem.classType == .double {
+                if value is Float {
+                    self.setValue(value, forKey: ivarItem.label)
+                }
+                else {
+                    let text = "\(value)"
+                    self.setValue(text.toDouble(), forKey: ivarItem.label)
+                }
+            }
             else if ivarItem.classType == .bool {
                 if value is Bool {
                     self.setValue(value, forKey: ivarItem.label)
@@ -155,21 +176,18 @@ let PKHParser_label = "PKHParser_label"
             else {
                 self.setValue(value, forKey: ivarItem.label)
             }
-            
-            
         }
-        
-        
     }
     
     open override var description: String {
         var result: [String] = []
-        let ivarList = self.ivarToDictionary()
+        let ivarList = self.toDictionary()
         result.reserveCapacity(ivarList.count)
-        result.append("======== \(self.className) ========")
+        result.append("\n\(self._descriptionTab)📝 ======== \(self.className) ========")
         for (key, value) in ivarList {
             //            print("label: \(key), class: \(self.className) value: \(value)")
-
+            
+            
             if let arrayValue = value as? [Any] {
                 result.append("\(key): ---- Array(\(arrayValue.count)) ----")
                 for (idx,obj) in arrayValue.enumerated() {
@@ -177,20 +195,28 @@ let PKHParser_label = "PKHParser_label"
                         result.append("[\(idx)] \(obj)")
                     }
                     else {
-                        if let objClass = obj as? PKHParser {
+                        if let subArray = obj as? [Any] {
+                            result.append("[\(idx)]---- SubArray(\(subArray.count)) ----")
+                            for case let (subIdx,subItem as PKHParser) in subArray.enumerated() {
+                                subItem._descriptionTab = "\t\(self._descriptionTab)"
+                                result.append("\t[\(subIdx)] \(subItem.description)")
+                            }
+                            result.append("---------------------------")
+                        }
+                        else if let objClass = obj as? PKHParser {
                             objClass._descriptionTab = "\t\(self._descriptionTab)"
                             result.append("[\(idx)] \(objClass.description)")
                         }
                         else {
                             result.append("[\(idx)] \(String(describing: type(of: value))) ????????")
-                            //                                fatalError("\(String(describing: value)) not NSObject" )
+                            //                                assertionFailure("\(String(describing: value)) not NSObject" )
                         }
                     }
                 }
                 if arrayValue.count > 0 {
                     result.append("---------------------------")
                 }
-
+                
             }
             else if checkObjectClass(value as AnyObject) {
                 result.append("\(key): \(value)")
@@ -202,12 +228,12 @@ let PKHParser_label = "PKHParser_label"
                 }
                 else {
                     result.append("\(key): \(String(describing: type(of: value))) ????????")
-                    //                        fatalError("\(String(describing: value)) not NSObject" )
+                    //                        assertionFailure("\(String(describing: value)) not NSObject" )
                 }
             }
         }
-
-        result.append("=======================================")
+        
+        result.append("📝 =======================================")
         return result.joined(separator: "\n\(self._descriptionTab)")
     }
     
