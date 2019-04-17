@@ -22,32 +22,14 @@ public class ObjectInfoMap {
     }
     
     @inline(__always) public func addObject(id: String, object: [IvarInfo]) {
-        if self.dictionary[id] == nil {
-            accessQueue.async(flags: .barrier) {
-                //                print("check 2222: \(id)")
-                self.dictionary[id] = object
-            }
+        accessQueue.async(flags: .barrier) {
+            //                print("check 2222: \(id)")
+            self.dictionary[id] = object
         }
     }
 }
 
-
 public var Object_Info_Dic = ObjectInfoMap()
-
-//let valueTypesMap: Dictionary<String, Any> = [
-//    "c" : Int8.self,
-//    "s" : Int16.self,
-//    "i" : Int32.self,
-//    "q" : Int.self, //also: Int64, NSInteger, only true on 64 bit platforms
-//    "S" : UInt16.self,
-//    "I" : UInt32.self,
-//    "Q" : UInt.self, //also UInt64, only true on 64 bit platforms
-//    "B" : Bool.self,
-//    "d" : Double.self,
-//    "f" : Float.self,
-//    "{" : Decimal.self
-//]
-
 
 @inline(__always) public func swiftClassFromString(_ className: String, bundleName: String = "") -> AnyClass? {
     
