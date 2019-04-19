@@ -82,9 +82,6 @@ public struct  IvarInfo {
     var dict = [String: Any]()
     for (label, value) in mirrored_object.children {
         guard let label = label else { continue }
-        if label == "_descriptionTab" {
-            continue
-        }
         dict[label] = value as AnyObject
     }
     
@@ -96,9 +93,6 @@ public struct  IvarInfo {
     var dict = [String: Any]()
     for (label, value) in mirrored_object.children {
         guard let label = label else { continue }
-        if label == "_descriptionTab" {
-            continue
-        }
         dict[label] = value as AnyObject
     }
     if let parent = mirrored_object.superclassMirror {
@@ -123,9 +117,6 @@ public struct  IvarInfo {
     
     for case let (label?, value) in mirror.children {
         //        print("label: \(label), class: \(classType.className) value: \(value)")
-        if label == "_descriptionTab" {
-            continue
-        }
         
         var className = String(describing: type(of: value))
         
@@ -170,13 +161,8 @@ public struct  IvarInfo {
                 else if (Mirror(reflecting: value).displayStyle != .`enum`) {
                     ivarDataList.append( IvarInfo(label: label, classType: .any, subClassType: nil, value: nil) )
                 }
-                
-                
             }
-            
-            
         }
-        
     }
     
     if let superClass = class_getSuperclass(classType),

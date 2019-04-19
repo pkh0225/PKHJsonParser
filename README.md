@@ -178,8 +178,6 @@ class Test : PKHParser {
 
 @objcMembers open class PKHParser: NSObject {
     
-    private var _descriptionTab: String = "\t"
-    
     public override init() {
         super.init()
     }
@@ -300,52 +298,82 @@ class Test : PKHParser {
     }
     
     open override var description: String {
+        return getDescription()
+    }
+    
+    private enum descriptionType {
+        case `default`
+        case array
+        case subInstance
+    }
+    
+    private func getDescription(_ tapCount: UInt = 0, _ addType: descriptionType = .default) -> String {
+        var tap = ""
+        for _ in 0...tapCount { tap += "\t" }
         var result: [String] = []
-        let ivarList = self.ivarToDictionary()
+        let ivarList = self.toDictionary()
         result.reserveCapacity(ivarList.count)
-        result.append("======== \(self.className) ========")
+        switch addType {
+        case .default:
+            result.append("\n\(tap)✏️ ======== \(self.className) ✏️ ========")
+        case .array:
+            result.append("⬇️ --- \(self.className) ⬇️ ---")
+        case .subInstance:
+            result.append("➡️ --- \(self.className) ➡️ ---")
+        }
+        
         for (key, value) in ivarList {
             //            print("label: \(key), class: \(self.className) value: \(value)")
-
+            
+            
             if let arrayValue = value as? [Any] {
-                result.append("\(key): ---- Array(\(arrayValue.count)) ----")
+                result.append("\(key): ---- Array(\(arrayValue.count)) -------------------------------")
                 for (idx,obj) in arrayValue.enumerated() {
                     if checkObjectClass(obj) {
                         result.append("[\(idx)] \(obj)")
                     }
                     else {
-                        if let objClass = obj as? PKHParser {
-                            objClass._descriptionTab = "\t\(self._descriptionTab)"
-                            result.append("[\(idx)] \(objClass.description)")
+                        if let subArray = obj as? [Any] {
+                            result.append("[\(idx)]---- SubArray(\(subArray.count)) ----")
+                            for case let (subIdx,subItem as PKHParser) in subArray.enumerated() {
+                                result.append("\t[\(subIdx)] \(subItem.getDescription(tapCount + 1, .array))")
+                            }
+                            result.append("---------------------------")
+                        }
+                        else if let objClass = obj as? PKHParser {
+                            result.append("[\(idx)] \(objClass.getDescription(tapCount + 1, .array))")
                         }
                         else {
-                            result.append("[\(idx)] \(self.className) ????????")
-                            //                                fatalError("\(String(describing: value)) not NSObject" )
+                            result.append("[\(idx)] \(String(describing: type(of: value))) ????????")
+                            //                                assertionFailure("\(String(describing: value)) not NSObject" )
                         }
                     }
                 }
                 if arrayValue.count > 0 {
-                    result.append("---------------------------")
+                    result.append("------------------------------------------------------")
                 }
-
+                
             }
             else if checkObjectClass(value as AnyObject) {
                 result.append("\(key): \(value)")
             }
             else {
                 if let objClass = value as? PKHParser {
-                    objClass._descriptionTab = "\t\(self._descriptionTab)"
-                    result.append("\(key): \(objClass.description)")
+                    result.append("\(key): \(objClass.getDescription(tapCount + 1, .subInstance))")
                 }
                 else {
-                    result.append("\(key): \(self.className) ????????")
-                    //                        fatalError("\(String(describing: value)) not NSObject" )
+                    result.append("\(key): \(String(describing: type(of: value))) ????????")
+                    //                        assertionFailure("\(String(describing: value)) not NSObject" )
                 }
             }
         }
-
-        result.append("=======================================")
-        return result.joined(separator: "\n\(self._descriptionTab)")
+        switch addType {
+        case .default:
+            result.append("✏️ ================== \(self.className) ===================== ✏️")
+        case .array, .subInstance:
+            result.append("----------- \(self.className)  -----------")
+        }
+        return result.joined(separator: "\n\(tap)")
     }
     
 }
