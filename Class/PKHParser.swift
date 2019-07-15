@@ -39,7 +39,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
     //        self.parser(map: dic, anyData: anyData, serializeKey: serializeKey, as: self, completionHandler: completionHandler)
     //    }
     
-    public class func parser<T:PKHParser>(map dic : [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping (T) -> Void) {
+    public class func initAsync<T:PKHParser>(map dic : [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping (T) -> Void) {
         guard let dic = dic else { return }
         ParserObjectConcurrentQueue.async {
             let obj = T.init(map: dic, anyData: anyData, serializeKey: serializeKey)

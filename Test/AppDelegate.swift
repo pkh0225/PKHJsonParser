@@ -76,7 +76,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let obj = Test(map: dic!)
         print(obj)
         
-        Test.parser(map: dic!) { (obj: Test) in
+        Test.initAsync(map: dic!) { (obj: Test) in
             print(obj)
         }
         
