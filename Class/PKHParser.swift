@@ -73,21 +73,26 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
         let maps = self.getDataMap()
         let ivarList = self.ivarInfoList()
         for ivarItem in ivarList {
-            var changeKey = ivarItem.label
-            var parserMap: ParserMap?
+            var parserMaps = [ParserMap]()
+            parserMaps.append(ParserMap(ivar: ivarItem.label, jsonKey: ivarItem.label))
+            
             if let maps = maps {
                 for pm in maps {
                     if pm.ivar == ivarItem.label {
-                        parserMap = pm
-                        break;
+                        parserMaps.append(pm)
                     }
                 }
             }
-            if parserMap != nil && parserMap!.jsonKey != "" {
-                changeKey = parserMap!.jsonKey
+            
+            var data: Any? = nil
+            for map in parserMaps {
+                if let dicValue = dic[map.jsonKey]  {
+                    data = dicValue
+                    break
+                }
             }
             //            print(changeKey)
-            guard let value = dic[changeKey] else { continue }
+            guard let value = data else { continue }
             guard value is NSNull == false else { continue }
             
             if ivarItem.classType == .array {
