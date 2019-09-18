@@ -104,7 +104,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
                 var array: [Any] = []
                 array.reserveCapacity(arrayValue.count)
                 for arraySubDic in arrayValue {
-                    if let dic = arraySubDic as? [String:Any] {
+                    if let dic = arraySubDic as? [String:Any], dic.isEmpty == false {
                         let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
                         array.append(addObj)
                     }
