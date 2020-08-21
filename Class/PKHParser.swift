@@ -176,6 +176,9 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
                     self.setValue(text.toBool(), forKey: ivarItem.label)
                 }
             }
+            else if ivarItem.classType == .exceptType {
+                continue
+            }
             else {
                 self.setValue(value, forKey: ivarItem.label)
             }

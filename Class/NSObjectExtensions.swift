@@ -10,26 +10,15 @@ import Foundation
 import UIKit
 
 public class ObjectInfoMap {
-    public var dictionary = [String: [IvarInfo]]()
-    public let accessQueue = DispatchQueue(label: "queue_ObjectInfoMap", qos: .userInitiated, attributes: .concurrent)
+    public var ivarInfoList: [IvarInfo]
     
-    @inline(__always) public func object(withID id: String) -> [IvarInfo]? {
-        var result:  [IvarInfo]? = nil
-        accessQueue.sync() {
-            result = self.dictionary[id]
-        }
-        return result
-    }
-    
-    @inline(__always) public func addObject(id: String, object: [IvarInfo]) {
-        accessQueue.async(flags: .barrier) {
-            //                print("check 2222: \(id)")
-            self.dictionary[id] = object
-        }
+    public init(ivarInfoList: [IvarInfo]) {
+        self.ivarInfoList = ivarInfoList
     }
 }
 
-public var Object_Info_Dic = ObjectInfoMap()
+
+public var Object_Info_Cache = NSCache<NSString, ObjectInfoMap>()
 
 @inline(__always) public func swiftClassFromString(_ className: String, bundleName: String = "") -> AnyClass? {
     
@@ -64,6 +53,7 @@ public struct  IvarInfo {
         case cgfloat
         case double
         case bool
+        case exceptType //예외 항목
     }
     
     public var label: String = ""
@@ -154,11 +144,16 @@ public struct  IvarInfo {
                 ivarDataList.append( IvarInfo(label: label, classType: .bool, subClassType: nil, value: nil) )
             }
             else {
-                //                print("getIvarInfoList etc >>>> label: \(label), className: \(className), \(String(describing: Mirror(reflecting: value).displayStyle))")
                 if (Mirror(reflecting: value).displayStyle == .class) {
                     ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className), value: nil) )
                 }
-                else if (Mirror(reflecting: value).displayStyle != .`enum`) {
+                else  if (Mirror(reflecting: value).displayStyle == .`enum`){
+                    ivarDataList.append( IvarInfo(label: label, classType: .exceptType, subClassType: nil, value: nil) )
+                }
+                else  if (Mirror(reflecting: value).displayStyle == .struct){
+                     ivarDataList.append( IvarInfo(label: label, classType: .exceptType, subClassType: nil, value: nil) )
+                }
+                else {
                     ivarDataList.append( IvarInfo(label: label, classType: .any, subClassType: nil, value: nil) )
                 }
             }
@@ -192,13 +187,16 @@ extension NSObject {
     
     @inline(__always) public func ivarInfoList() -> [IvarInfo] {
         //        print(String(describing: type(of:self)))
-        if let info = Object_Info_Dic.object(withID: self.className) {
-            return info
+        Object_Info_Cache.countLimit = 100
+        if let info: ObjectInfoMap = Object_Info_Cache.object(forKey: self.className as NSString) {
+            return info.ivarInfoList
         }
-        else {
-            let info = getIvarInfoList(type(of:self))
-            Object_Info_Dic.addObject(id: self.className, object: info)
-            return info
+        else
+        {
+            let infoList: [IvarInfo] = getIvarInfoList(type(of:self))
+            let info: ObjectInfoMap = ObjectInfoMap(ivarInfoList: infoList )
+            Object_Info_Cache.setObject(info, forKey: self.className as NSString)
+            return infoList
         }
         //        return getIvarInfoList(type(of:self))
     }
