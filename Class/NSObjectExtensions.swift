@@ -93,8 +93,6 @@ public struct  IvarInfo {
     var dict: [String: Any] = [String: Any]()
     for (label, value) in mirrored_object.children {
         guard let label = label else { continue }
-        guard label != "_debugAnyData" else { continue }
-        guard label != "_debugJsonDic" else { continue }
 
         if value is String || value is Int || value is Float || value is CGFloat || value is Double || value is Bool {
             dict[label] = value as AnyObject
