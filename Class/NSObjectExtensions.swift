@@ -69,29 +69,59 @@ public struct  IvarInfo {
 
 
 @inline(__always) public func getDictionaryExcludSuper(mirrored_object: Mirror) -> [String: Any] {
-    var dict = [String: Any]()
+    var dict: [String: Any] = [String: Any]()
     for (label, value) in mirrored_object.children {
         guard let label = label else { continue }
-        dict[label] = value as AnyObject
+        if let objList = value as? [NSObject] {
+            var dicList: [[String: Any]] = []
+            for obj in objList {
+                let dic = obj.toDictionary()
+                dicList.append(dic)
+            }
+            dict[label] = dicList
+        }
+        else {
+            dict[label] = value as AnyObject
+        }
+
     }
-    
+
     return dict
 }
 
-
 @inline(__always) public func getDictionary(mirrored_object: Mirror) -> [String: Any] {
-    var dict = [String: Any]()
+    var dict: [String: Any] = [String: Any]()
     for (label, value) in mirrored_object.children {
         guard let label = label else { continue }
-        dict[label] = value as AnyObject
-    }
-    if let parent = mirrored_object.superclassMirror {
-        let dict2 = getDictionary(mirrored_object: parent)
-        for (key,value) in dict2 {
-            dict.updateValue(value, forKey:key)
+        guard label != "_debugAnyData" else { continue }
+        guard label != "_debugJsonDic" else { continue }
+
+        if value is String || value is Int || value is Float || value is CGFloat || value is Double || value is Bool {
+            dict[label] = value as AnyObject
+        }
+        else if let objList = value as? [NSObject] {
+            var dicList: [[String: Any]] = []
+            for obj in objList {
+                let dic = obj.toDictionary()
+                dicList.append(dic)
+            }
+            dict[label] = dicList
+        }
+        else if let obj = value as? NSObject {
+            let dic = obj.toDictionary()
+            dict[label] = dic
+        }
+        else {
+            dict[label] = value as AnyObject
         }
     }
-    
+    if let parent: Mirror = mirrored_object.superclassMirror {
+        let dict2: [String: Any] = getDictionary(mirrored_object: parent)
+        for (key, value) in dict2 {
+            dict.updateValue(value, forKey: key)
+        }
+    }
+
     return dict
 }
 
@@ -174,31 +204,29 @@ public struct  IvarInfo {
 }
 
 extension NSObject {
-    
     @inline(__always) public func toDictionary() -> [String: Any] {
-        let mirrored_object = Mirror(reflecting: self)
-        return getDictionary(mirrored_object:mirrored_object)
+        let mirrored_object: Mirror = Mirror(reflecting: self)
+        return getDictionary(mirrored_object: mirrored_object)
     }
-    
+
     @inline(__always) public func toDictionaryExcludeSuperClass() -> [String: Any] {
-        let mirrored_object = Mirror(reflecting: self)
-        return getDictionaryExcludSuper(mirrored_object:mirrored_object)
+        let mirrored_object: Mirror = Mirror(reflecting: self)
+        return getDictionaryExcludSuper(mirrored_object: mirrored_object)
     }
-    
+
     @inline(__always) public func ivarInfoList() -> [IvarInfo] {
-        //        print(String(describing: type(of:self)))
+//        print(String(describing: type(of:self)))
         Object_Info_Cache.countLimit = 100
         if let info: ObjectInfoMap = Object_Info_Cache.object(forKey: self.className as NSString) {
             return info.ivarInfoList
         }
-        else
-        {
-            let infoList: [IvarInfo] = getIvarInfoList(type(of:self))
+        else {
+            let infoList: [IvarInfo] = getIvarInfoList(type(of: self))
             let info: ObjectInfoMap = ObjectInfoMap(ivarInfoList: infoList )
             Object_Info_Cache.setObject(info, forKey: self.className as NSString)
             return infoList
         }
-        //        return getIvarInfoList(type(of:self))
+//        return getIvarInfoList(type(of:self))
     }
 }
 

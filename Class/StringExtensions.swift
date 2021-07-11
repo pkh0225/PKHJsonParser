@@ -16,6 +16,19 @@ import UIKit
 #endif
 
 extension String {
+    public var isValid: Bool {
+        if self.isEmpty || self.count == 0 || self.trim().count == 0 || self == "(null)" || self == "null" || self == "nil" {
+            return false
+        }
+
+        return true
+    }
+
+    public func trim() -> String {
+        let str: String = self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
+        return str
+    }
+
     public func contains(_ find: String) -> Bool {
         return self.range(of: find) != nil
     }

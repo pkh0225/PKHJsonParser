@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 public struct ParserMap {
     var ivar: String
@@ -185,82 +186,77 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
         }
     }
     
-    open override var description: String {
-        return getDescription()
+    override open var description: String {
+        var result: [String] = []
+        result.append("✏️ ======== \(self.className) ======== ✏️")
+        let str = getDescription(1, mirrored_object: Mirror(reflecting: self))
+        if str.isValid {
+            result.append("\(str)")
+        }
+        result.append("✏️ ================== \(self.className) ===================== ✏️")
+        return result.joined(separator: "\n")
     }
-    
+
     private enum descriptionType {
         case `default`
         case array
         case subInstance
     }
-    
-    private func getDescription(_ tapCount: UInt = 0, _ addType: descriptionType = .default) -> String {
-        var tap = ""
+
+    private func getDescription(_ tapCount: UInt = 1, mirrored_object: Mirror) -> String {
+        var tap: String = ""
         for _ in 0...tapCount { tap += "\t" }
         var result: [String] = []
-        let ivarList = self.toDictionary()
-        result.reserveCapacity(ivarList.count)
-        switch addType {
-        case .default:
-            result.append("\n\(tap)✏️ ======== \(self.className) ✏️ ========")
-        case .array:
-            result.append("⬇️ --- \(self.className) ⬇️ ------")
-        case .subInstance:
-            result.append("👉 --- \(self.className) ------")
+
+        if let parent: Mirror = mirrored_object.superclassMirror {
+            let str = getDescription(tapCount, mirrored_object: parent)
+            if str.isValid {
+                result.append( str )
+            }
         }
-        
-        for (key, value) in ivarList {
-            //            print("label: \(key), class: \(self.className) value: \(value)")
-            
-            
-            if let arrayValue = value as? [Any] {
-                result.append("\(key): ---- Array(\(arrayValue.count)) -------------------------------")
-                for (idx,obj) in arrayValue.enumerated() {
-                    if checkObjectClass(obj) {
-                        result.append("[\(idx)] \(obj)")
-                    }
-                    else {
-                        if let subArray = obj as? [Any] {
-                            result.append("[\(idx)]---- SubArray(\(subArray.count)) ----")
-                            for case let (subIdx,subItem as PKHParser) in subArray.enumerated() {
-                                result.append("\t[\(subIdx)] \(subItem.getDescription(tapCount + 1, .array))")
-                            }
-                            result.append("---------------------------")
-                        }
-                        else if let objClass = obj as? PKHParser {
-                            result.append("[\(idx)] \(objClass.getDescription(tapCount + 1, .array))")
-                        }
-                        else {
-                            result.append("[\(idx)] \(String(describing: type(of: value))) ????????")
-                            //                                assertionFailure("\(String(describing: value)) not NSObject" )
-                        }
-                    }
-                }
-                if arrayValue.count > 0 {
-                    result.append("------------------------------------------------------")
-                }
-                
+
+        for (label, value) in mirrored_object.children {
+            guard let label = label else { continue }
+
+            if value is String || value is Int || value is Float || value is CGFloat || value is Double || value is Bool {
+                result.append("\(label) : \(value)")
             }
-            else if checkObjectClass(value as AnyObject) {
-                result.append("\(key): \(value)")
-            }
-            else {
-                if let objClass = value as? PKHParser {
-                    result.append("\(key): \(objClass.getDescription(tapCount + 1, .subInstance))")
+            else if let objList = value as? [Self] {
+                var strList = [String]()
+
+                if objList.count > 0 {
+                    for (idx, obj) in objList.enumerated() {
+                        strList.append("[\(idx)] \(obj.getDescription(tapCount + 1, mirrored_object: Mirror(reflecting: obj)))")
+                    }
+                    result.append("\(label) : ⬇️ --- \(objList[0].className) ⬇️ ------")
+                    result.append(contentsOf: strList)
+                    result.append("------------------------------------------------------------")
                 }
                 else {
-                    result.append("\(key): \(String(describing: type(of: value))) ????????")
-                    //                        assertionFailure("\(String(describing: value)) not NSObject" )
+                    result.append("\(label) : ⬇️ --- count = 0 ⬇️ ------")
                 }
+
+            }
+            else if let objList = value as? [String] {
+                var strList = [String]()
+                for (idx, obj) in objList.enumerated() {
+                    strList.append("\t[\(idx)] \(obj)")
+                }
+                result.append("\(label) : ⬇️ --- String ⬇️ ------")
+                result.append(contentsOf: strList)
+                result.append("--------------------------------------------------------------")
+            }
+
+            else if let obj = value as? Self {
+                result.append("\(label) : ➡️ === \(obj.className) ======")
+                result.append("\t\(obj.getDescription(tapCount + 1, mirrored_object: Mirror(reflecting: obj)))")
+                result.append("======= \(obj.className) ===============================")
+            }
+            else {
+                result.append("\(label) : \(value)")
             }
         }
-        switch addType {
-        case .default:
-            result.append("✏️ ================== \(self.className) ===================== ✏️")
-        case .array, .subInstance:
-            result.append("----------- \(self.className)  -----------")
-        }
+
         return result.joined(separator: "\n\(tap)")
     }
     
