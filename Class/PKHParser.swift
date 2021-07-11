@@ -99,7 +99,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
             if ivarItem.classType == .array {
                 guard let arrayValue = value as? [Any], arrayValue.count > 0 else { continue }
                 guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
-                    assertionFailure("self : [\(self.className))] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
+//                    assertionFailure("self : [\(self.className))] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
                     continue
                 }
                 var array: [Any] = []
@@ -115,7 +115,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
             }
             else if ivarItem.classType == .dictionary {
                 guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
-                    assertionFailure("self : [\(self.className)] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
+//                    assertionFailure("self : [\(self.className)] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
                     continue
                 }
                 if let dic = value as? [String:Any], dic.isEmpty == false {
