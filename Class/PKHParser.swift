@@ -217,9 +217,6 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
 
         for (label, value) in mirrored_object.children {
             guard let label = label else { continue }
-            guard label != "_debugAnyData" else { continue }
-            guard label != "_debugJsonDic" else { continue }
-            guard label != "_result" else { continue }
 
             if value is String || value is Int || value is Float || value is CGFloat || value is Double || value is Bool {
                 result.append("\(label) : \(value)")
