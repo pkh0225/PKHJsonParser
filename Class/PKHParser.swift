@@ -191,7 +191,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
         result.append("✏️ ======== \(self.className) ======== ✏️")
         let str = getDescription(1, mirrored_object: Mirror(reflecting: self))
         if str.isValid {
-            result.append("\(str)")
+            result.append("\t\(str)")
         }
         result.append("✏️ ================== \(self.className) ===================== ✏️")
         return result.joined(separator: "\n")
@@ -205,7 +205,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
 
     private func getDescription(_ tapCount: UInt = 1, mirrored_object: Mirror) -> String {
         var tap: String = ""
-        for _ in 0...tapCount { tap += "\t" }
+        for _ in 1...tapCount { tap += "\t" }
         var result: [String] = []
 
         if let parent: Mirror = mirrored_object.superclassMirror {
@@ -217,18 +217,21 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
 
         for (label, value) in mirrored_object.children {
             guard let label = label else { continue }
+            guard label != "_debugAnyData" else { continue }
+            guard label != "_debugJsonDic" else { continue }
+            guard label != "_result" else { continue }
 
             if value is String || value is Int || value is Float || value is CGFloat || value is Double || value is Bool {
                 result.append("\(label) : \(value)")
             }
-            else if let objList = value as? [Self] {
+            else if let objList = value as? [PKHParser] {
                 var strList = [String]()
 
                 if objList.count > 0 {
                     for (idx, obj) in objList.enumerated() {
                         strList.append("[\(idx)] \(obj.getDescription(tapCount + 1, mirrored_object: Mirror(reflecting: obj)))")
                     }
-                    result.append("\(label) : ⬇️ --- \(objList[0].className) ⬇️ ------")
+                    result.append("\(label) : ⬇️ --- \(objList[safe: 0]?.className ?? "count = 0") ⬇️ ------")
                     result.append(contentsOf: strList)
                     result.append("------------------------------------------------------------")
                 }
@@ -247,7 +250,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
                 result.append("--------------------------------------------------------------")
             }
 
-            else if let obj = value as? Self {
+            else if let obj = value as? PKHParser {
                 result.append("\(label) : ➡️ === \(obj.className) ======")
                 result.append("\t\(obj.getDescription(tapCount + 1, mirrored_object: Mirror(reflecting: obj)))")
                 result.append("======= \(obj.className) ===============================")
@@ -262,3 +265,14 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
     
 }
 
+extension Array {
+    public subscript(safe index: Int?) -> Element? {
+        guard let index = index else { return nil }
+        if indices.contains(index) {
+            return self[index]
+        }
+        else {
+            return nil
+        }
+    }
+}
