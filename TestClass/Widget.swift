@@ -14,7 +14,7 @@ class Widget : PKHParser {
     var stringArray = [String]()
     var windowT: WindowT?
     var testDebug: String = ""
-
+    var testDebug2: Int = 0
 
 }
 

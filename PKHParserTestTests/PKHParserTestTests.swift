@@ -16,6 +16,7 @@ class PKHParserTestTests: XCTestCase {
         jsonString = """
 {"widget": {
     "testDebug": "on",
+    "testDebug2": 99,
      "stringArray": ["a","b","c"],
     "windowT": {
         "title": "Sample Konfabulator Widget",
@@ -138,13 +139,111 @@ class PKHParserTestTests: XCTestCase {
             //then
             XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
         }
-
     }
+
+    func testSubClass() throws {
+        do {
+            //given
+            let expectedValue = "on"
+            //when
+            let testingResult = testObj.widgetData?.testDebug ?? ""
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+        do {
+            //given
+            let expectedValue = 99
+            //when
+            let testingResult = testObj.widgetData?.testDebug2 ?? 0
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+    }
+
+    func testSubSub1Class() throws {
+        do {
+            //given
+            let expectedValue = "center"
+            //when
+            let testingResult = testObj.widgetData?.testImage?.alignment ?? ""
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+        do {
+            //given
+            let expectedValue = 250
+            //when
+            let testingResult = testObj.widgetData?.testImage?.hOffset ?? 0
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+        do {
+            //given
+            let expectedValue = 250
+            //when
+            let testingResult = testObj.widgetData?.testImage?.vOffset ?? 0
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+        do {
+            //given
+            let expectedValue = "sun1"
+            //when
+            let testingResult = testObj.widgetData?.testImage?.name ?? ""
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+        do {
+            //given
+            let expectedValue = "Images/Sun.png"
+            //when
+            let testingResult = testObj.widgetData?.testImage?.src ?? ""
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+    }
+
+    func testSubSub2Class() throws {
+        do {
+            //given
+            let expectedValue = "Sample Konfabulator Widget"
+            //when
+            let testingResult = testObj.widgetData?.windowT?.title ?? ""
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+        do {
+            //given
+            let expectedValue = 500
+            //when
+            let testingResult = testObj.widgetData?.windowT?.width ?? 0
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+        do {
+            //given
+            let expectedValue = 500
+            //when
+            let testingResult = testObj.widgetData?.windowT?.height ?? 0
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+        do {
+            //given
+            let expectedValue = "main_window"
+            //when
+            let testingResult = testObj.widgetData?.windowT?.name ?? ""
+            //then
+            XCTAssertEqual(expectedValue, testingResult, "error!! \(expectedValue): \(testingResult)")
+        }
+    }
+
 
     func testPerformanceExample() throws {
         // This is an example of a performance test case.
         self.measure {
-            // Put the code you want to measure the time of here.
+//            let dic = jsonString.toDictionary()
+//            testObj = Test(map: dic!)
         }
     }
 
