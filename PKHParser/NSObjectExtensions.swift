@@ -175,10 +175,10 @@ public struct  IvarInfo {
                 if (Mirror(reflecting: value).displayStyle == .class) {
                     ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className), value: nil) )
                 }
-                else  if (Mirror(reflecting: value).displayStyle == .`enum`){
+                else  if (Mirror(reflecting: value).displayStyle == .`enum`) {
                     ivarDataList.append( IvarInfo(label: label, classType: .exceptType, subClassType: nil, value: nil) )
                 }
-                else  if (Mirror(reflecting: value).displayStyle == .struct){
+                else  if (Mirror(reflecting: value).displayStyle == .struct) {
                      ivarDataList.append( IvarInfo(label: label, classType: .exceptType, subClassType: nil, value: nil) )
                 }
                 else {
