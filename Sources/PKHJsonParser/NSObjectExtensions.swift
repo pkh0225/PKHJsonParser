@@ -53,6 +53,7 @@ public struct  IvarInfo {
         case cgfloat
         case double
         case bool
+        case `enum`
         case exceptType //예외 항목
     }
     
@@ -176,7 +177,7 @@ public struct  IvarInfo {
                     ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className), value: nil) )
                 }
                 else  if (Mirror(reflecting: value).displayStyle == .`enum`) {
-                    ivarDataList.append( IvarInfo(label: label, classType: .exceptType, subClassType: nil, value: nil) )
+                    ivarDataList.append( IvarInfo(label: label, classType: .enum, subClassType: nil, value: nil) )
                 }
                 else  if (Mirror(reflecting: value).displayStyle == .struct) {
                      ivarDataList.append( IvarInfo(label: label, classType: .exceptType, subClassType: nil, value: nil) )

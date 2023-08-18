@@ -70,7 +70,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             "hOffset": 250,
             "vOffset": 100,
             "alignment": "center",
-            "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
+            "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;",
+            "boolTest": true
         }
         """
         let dic = jsonString.toDictionary()

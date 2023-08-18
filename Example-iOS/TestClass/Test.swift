@@ -18,6 +18,7 @@ class Test : PKHParser {
     var vOffset: Int = 0
     var alignment: String = ""
     var name: String = ""
+    var boolTest: Bool = false
 
     // json key ans ivar Different
     override func getDataMap() -> [ParserMap]? {
