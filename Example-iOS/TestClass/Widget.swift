@@ -6,8 +6,12 @@
 */
 
 import Foundation
+enum TestEmum: String {
+    case aaa
+    case bbb
+}
 
-class Widget : PKHParser { 
+class Widget : PKHParser {
 
     var testImage: TestImage?
     var testText: TestText?
@@ -15,6 +19,12 @@ class Widget : PKHParser {
     var windowT: WindowT?
     var testDebug: String = ""
     var testDebug2: Int = 0
-
+    var intArray = [Int]()
+    var cgfloatArray = [CGFloat]()
+    var floatArray = [Float]()
+    var doublerray = [Double]()
+    var boolArray = [Bool]()
+    var dicData = [String: Any]()
+    var enumText = TestEmum.aaa
 }
 

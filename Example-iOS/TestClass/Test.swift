@@ -14,8 +14,8 @@ class Test : PKHParser {
     var style: String = ""
     var onMouseUp: String = ""
     var size: Int = 0
-    var hOffset: Int = 0
-    var vOffset: Int = 0
+    var hOffset: CGFloat = 0
+    var vOffset: CGFloat = 0
     var alignment: String = ""
     var name: String = ""
     var boolTest: Bool = false

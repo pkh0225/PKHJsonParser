@@ -42,8 +42,7 @@ public var Object_Info_Cache = NSCache<NSString, ObjectInfoMap>()
 }
 
 public struct  IvarInfo {
-    
-    public enum IvarInfoClassType {
+    public enum IvarInfoClassType: String {
         case any
         case array
         case dictionary
@@ -53,19 +52,24 @@ public struct  IvarInfo {
         case cgfloat
         case double
         case bool
-        case `enum`
         case exceptType //예외 항목
+
+        public init(string: String) {
+            let value = string.lowercased()
+            self = .init(rawValue: value) ?? .exceptType
+        }
     }
     
     public var label: String = ""
-    public var classType: IvarInfoClassType = .any
+    public var classType: IvarInfoClassType = .exceptType
     public var subClassType: AnyClass?
-    
-    public init(label: String, classType: IvarInfoClassType, subClassType: AnyClass?, value: Any?) {
-        self.label = label
-        self.classType = classType
-        self.subClassType = subClassType // subClas가 custom class인 array, dictionary 일때만 사용.
-    }
+    public var subValueType: IvarInfoClassType = .exceptType
+
+//    public init(label: String, classType: IvarInfoClassType, subClassType: AnyClass?, value: Any?) {
+//        self.label = label
+//        self.classType = classType
+//        self.subClassType = subClassType // subClas가 custom class인 array, dictionary 일때만 사용.
+//    }
 }
 
 
@@ -135,55 +139,56 @@ public struct  IvarInfo {
     ivarDataList.reserveCapacity(mirror.children.count)
     
     for case let (label?, value) in mirror.children {
-        //        print("label: \(label), class: \(classType.className) value: \(value)")
-        
+//        if label.contains("dicData") {
+//            print("label: \(label), class: \(classType.className) value: \(String(describing: type(of: value)))")
+//        }
+
         var className = String(describing: type(of: value))
         
-        if className.contains("Array<String>") || className.contains("Array<Any>") || className.contains(".Type") || className.contains("Dictionary<") || className.contains("Optional<Any>") || className.contains("Optional<AnyObject>") {
-            ivarDataList.append( IvarInfo(label: label, classType: .any, subClassType: nil, value: nil) )
+        if className.contains("Array<Any>") || className.contains(".Type") || className.contains("Dictionary<") || className.contains("Optional<Any>") || className.contains("Optional<AnyObject>") {
+            ivarDataList.append( IvarInfo(label: label, classType: .any, subClassType: nil) )
         }
         else if className.contains("Array<") {
             className = className.replace(">", "")
             className = className.replace("Array<", "")
-            ivarDataList.append( IvarInfo(label: label, classType: .array, subClassType: swiftClassFromString(className) , value: nil) )
+            if className == "String" || className == "Int" || className == "CGFloat" || className == "Float" || className == "Double" || className == "Bool" {
+                ivarDataList.append( IvarInfo(label: label, classType: .array, subValueType: IvarInfo.IvarInfoClassType(string: className)) )
+            }
+            else {
+                ivarDataList.append( IvarInfo(label: label, classType: .array, subClassType: swiftClassFromString(className)) )
+            }
         }
         else if className.contains("Optional<") || className.contains("ImplicitlyUnwrappedOptional<") {
             className = className.replace(">", "")
             className = className.replace("ImplicitlyUnwrappedOptional<", "")
             className = className.replace("Optional<", "")
-            ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className), value: nil) )
+            ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className)) )
         }
         else {
             if value is String {
-                ivarDataList.append( IvarInfo(label: label, classType: .string, subClassType: nil, value: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .string, subClassType: nil) )
             }
             else if value is Int {
-                ivarDataList.append( IvarInfo(label: label, classType: .int, subClassType: nil, value: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .int, subClassType: nil) )
             }
             else if value is Float {
-                ivarDataList.append( IvarInfo(label: label, classType: .float, subClassType: nil, value: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .float, subClassType: nil) )
             }
             else if value is CGFloat {
-                ivarDataList.append( IvarInfo(label: label, classType: .cgfloat, subClassType: nil, value: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .cgfloat, subClassType: nil) )
             }
             else if value is Double {
-                ivarDataList.append( IvarInfo(label: label, classType: .double, subClassType: nil, value: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .double, subClassType: nil) )
             }
             else if value is Bool {
-                ivarDataList.append( IvarInfo(label: label, classType: .bool, subClassType: nil, value: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .bool, subClassType: nil) )
             }
             else {
                 if (Mirror(reflecting: value).displayStyle == .class) {
-                    ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className), value: nil) )
-                }
-                else  if (Mirror(reflecting: value).displayStyle == .`enum`) {
-                    ivarDataList.append( IvarInfo(label: label, classType: .enum, subClassType: nil, value: nil) )
-                }
-                else  if (Mirror(reflecting: value).displayStyle == .struct) {
-                     ivarDataList.append( IvarInfo(label: label, classType: .exceptType, subClassType: nil, value: nil) )
+                    ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className)) )
                 }
                 else {
-                    ivarDataList.append( IvarInfo(label: label, classType: .any, subClassType: nil, value: nil) )
+                     ivarDataList.append( IvarInfo(label: label, classType: .exceptType, subClassType: nil) )
                 }
             }
         }

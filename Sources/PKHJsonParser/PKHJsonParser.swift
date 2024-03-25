@@ -19,15 +19,6 @@ public struct ParserMap {
     }
 }
 
-@inline(__always) public func checkObjectClass(_ obj: Any) -> Bool {
-    if (obj is String) || (obj is NSNumber) || (obj is Dictionary<String, Any>) {
-        return true
-    }
-    else {
-        return false
-    }
-}
-
 let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQueue", qos: .userInitiated, attributes: .concurrent)
 
 @objcMembers open class PKHParser: NSObject {
@@ -62,8 +53,6 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
             self.setSerialize(map: dic, anyData: anyData)
             self.afterParsed(dic, anyData: anyData)
         }
-        
-        
     }
     
     open func getDataMap() -> [ParserMap]? { return nil }
@@ -92,24 +81,31 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
                     break
                 }
             }
-            //            print(changeKey)
+//            if ivarItem.label == "enumText" {
+//                print("\(data)")
+//            }
             guard let value = data else { continue }
             guard value is NSNull == false else { continue }
             
             if ivarItem.classType == .array {
                 guard let arrayValue = value as? [Any], arrayValue.count > 0 else { continue }
-                guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
-//                    assertionFailure("self : [\(self.className))] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
-                    continue
-                }
                 var array: [Any] = []
                 array.reserveCapacity(arrayValue.count)
-                for arraySubDic in arrayValue {
-                    if let dic = arraySubDic as? [String:Any], dic.isEmpty == false {
-                        let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
-                        array.append(addObj)
+                if let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type {
+                    for arraySubDic in arrayValue {
+                        if let dic = arraySubDic as? [String:Any], dic.isEmpty == false {
+                            let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
+                            array.append(addObj)
+                        }
+
                     }
-                    
+                }
+                else {
+                    for arraySub in arrayValue {
+                        if let data = changeTypeValue(type: ivarItem.subValueType, value: arraySub) {
+                            array.append(data)
+                        }
+                    }
                 }
                 self.setValue(array, forKey: ivarItem.label)
             }
@@ -123,69 +119,53 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
                     self.setValue(addObj, forKey: ivarItem.label)
                 }
             }
-            else if ivarItem.classType == .string {
-                if value is String {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    self.setValue("\(value)", forKey: ivarItem.label)
-                }
-                
+            else if let data = changeTypeValue(type: ivarItem.classType, value: value) {
+                self.setValue(data , forKey: ivarItem.label)
             }
-            else if ivarItem.classType == .int {
-                if value is Int {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    let text = "\(value)"
-                    self.setValue(text.toInt(), forKey: ivarItem.label)
-                }
-            }
-            else if ivarItem.classType == .float {
-                if value is Float {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    let text = "\(value)"
-                    self.setValue(text.toFloat(), forKey: ivarItem.label)
-                }
-            }
-            else if ivarItem.classType == .cgfloat {
-                if value is Float {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    let text = "\(value)"
-                    self.setValue(text.toCGFloat(), forKey: ivarItem.label)
-                }
-            }
-            else if ivarItem.classType == .double {
-                if value is Float {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    let text = "\(value)"
-                    self.setValue(text.toDouble(), forKey: ivarItem.label)
-                }
-            }
-            else if ivarItem.classType == .bool {
-                if value is Bool {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    let text = "\(value)"
-                    self.setValue(text.toBool(), forKey: ivarItem.label)
-                }
+            else if ivarItem.classType == .any {
+                print("\n debug parser AnyType label: \(ivarItem.label) type: \(String(describing: type(of: value))), value: \(value)\n")
+                self.setValue(value, forKey: ivarItem.label)
             }
             else if ivarItem.classType == .exceptType {
                 continue
             }
             else {
-                self.setValue(value, forKey: ivarItem.label)
+                print("""
+
+                      
+                      🧨🧨🧨   파싱 오류입니다. 공통파트에 신고해 주세요   🧨🧨🧨
+                      lable: \(ivarItem.label)
+                      value: \(value)
+                      
+
+                      """)
+//                self.setValue(value, forKey: ivarItem.label)
             }
         }
     }
-    
+
+    func changeTypeValue(type: IvarInfo.IvarInfoClassType, value: Any) -> Any? {
+        if type == .string {
+            return value is String ? value : "\(value)"
+        }
+        else if type == .int {
+            return value is Int ? value : "\(value)".toInt()
+        }
+        else if type == .float {
+            return value is Float ? value : "\(value)".toFloat()
+        }
+        else if type == .cgfloat {
+            return value is Float ? value : "\(value)".toCGFloat()
+        }
+        else if type == .double {
+            return value is Double ? value : "\(value)".toDouble()
+        }
+        else if type == .bool {
+            return value is Bool ? value : "\(value)".toBool()
+        }
+        return nil
+    }
+
     override open var description: String {
         var result: [String] = []
         result.append("✏️ ======== \(self.className) ======== ✏️")
