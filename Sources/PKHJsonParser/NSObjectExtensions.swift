@@ -17,7 +17,6 @@ public class ObjectInfoMap {
     }
 }
 
-
 public var Object_Info_Cache = NSCache<NSString, ObjectInfoMap>()
 
 @inline(__always) public func swiftClassFromString(_ className: String, bundleName: String = "") -> AnyClass? {
@@ -143,6 +142,7 @@ public struct  IvarInfo {
 //            print("label: \(label), class: \(classType.className) value: \(String(describing: type(of: value)))")
 //        }
 
+        let label = label.replace("$__lazy_storage_$_", "")
         var className = String(describing: type(of: value))
         
         if className.contains("Array<Any>") || className.contains(".Type") || className.contains("Dictionary<") || className.contains("Optional<Any>") || className.contains("Optional<AnyObject>") {

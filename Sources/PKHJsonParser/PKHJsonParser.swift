@@ -89,25 +89,41 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
             
             if ivarItem.classType == .array {
                 guard let arrayValue = value as? [Any], arrayValue.count > 0 else { continue }
-                var array: [Any] = []
-                array.reserveCapacity(arrayValue.count)
                 if let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type {
+                    var array: [Any] = []
+                    array.reserveCapacity(arrayValue.count)
                     for arraySubDic in arrayValue {
-                        if let dic = arraySubDic as? [String:Any], dic.isEmpty == false {
+                        if let dic = arraySubDic as? [String: Any], dic.isEmpty == false {
                             let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
                             array.append(addObj)
                         }
-
+                        else if let subArray = arraySubDic as? [Any], subArray.count > 0 {
+                            var addSubarray: [Any] = []
+                            addSubarray.reserveCapacity(subArray.count)
+                            for ssDic in subArray {
+                                if let dic = ssDic as? [String: Any], dic.isEmpty == false {
+                                    let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
+                                    addSubarray.append(addObj)
+                                }
+                            }
+                            if addSubarray.count > 0 {
+                                array.append(addSubarray)
+                            }
+                        }
                     }
+                    self.setValue(array, forKey: ivarItem.label)
                 }
                 else {
+                    var array: [Any] = []
+                    array.reserveCapacity(arrayValue.count)
                     for arraySub in arrayValue {
                         if let data = changeTypeValue(type: ivarItem.subValueType, value: arraySub) {
                             array.append(data)
                         }
                     }
+                    self.setValue(array, forKey: ivarItem.label)
                 }
-                self.setValue(array, forKey: ivarItem.label)
+
             }
             else if ivarItem.classType == .dictionary {
                 guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
@@ -120,7 +136,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
                 }
             }
             else if let data = changeTypeValue(type: ivarItem.classType, value: value) {
-                self.setValue(data , forKey: ivarItem.label)
+                self.setValue(data, forKey: ivarItem.label)
             }
             else if ivarItem.classType == .any {
                 print("\n debug parser AnyType label: \(ivarItem.label) type: \(String(describing: type(of: value))), value: \(value)\n")
@@ -133,7 +149,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
                 print("""
 
                       
-                      🧨🧨🧨   파싱 오류입니다. 공통파트에 신고해 주세요   🧨🧨🧨
+                      🧨🧨🧨   파싱 오류입니다.  🧨🧨🧨
                       lable: \(ivarItem.label)
                       value: \(value)
                       
@@ -197,9 +213,28 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
 
         for (label, value) in mirrored_object.children {
             guard let label = label else { continue }
-
             if value is String || value is Int || value is Float || value is CGFloat || value is Double || value is Bool {
                 result.append("\(label) : \(value)")
+            }
+            else if let objList = value as? [[PKHParser]] {
+                var strList = [String]()
+                if objList.count > 0 {
+                    for (idx, obj) in objList.enumerated() {
+                        strList.append("[\(idx)]")
+                        for (idx, subObj) in obj.enumerated() {
+                            strList.append("\t[\(idx)] \(subObj.getDescription(tapCount + 2, mirrored_object: Mirror(reflecting: subObj)))")
+                        }
+                        if idx == 0 {
+                            result.append("\(label) : ⬇️ --- \(obj[safe: 0]?.className ?? "count = 0") ⬇️ ------")
+                        }
+                    }
+                    result.append(contentsOf: strList)
+                    result.append("------------------------------------------------------------")
+                }
+                else {
+                    result.append("\(label) : ⬇️ --- count = 0 ⬇️ ------")
+                }
+
             }
             else if let objList = value as? [PKHParser] {
                 var strList = [String]()
@@ -230,7 +265,7 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
             else if let obj = value as? PKHParser {
                 result.append("\(label) : ➡️ === \(obj.className) ======")
                 result.append("\t\(obj.getDescription(tapCount + 1, mirrored_object: Mirror(reflecting: obj)))")
-                result.append("======= \(obj.className) ===============================")
+                result.append("-------- \(obj.className) -----------------------------------")
             }
             else {
                 result.append("\(label) : \(value)")

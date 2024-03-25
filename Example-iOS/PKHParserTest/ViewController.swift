@@ -50,6 +50,7 @@ class ViewController: UIViewController {
             }
         },
         "windowsDataList": [
+    [
             {
                 "title": "Sample Konfabulator Widget",
                 "name": "main_window",
@@ -68,6 +69,27 @@ class ViewController: UIViewController {
                 "width": 500,
                 "height": 500
             }
+    ],
+    [
+                {
+                    "title": "Sample Konfabulator Widget111111111",
+                    "name": "main_window111111111",
+                    "width": 500111111,
+                    "height": 5001111111
+                },
+                {
+                    "title": "Sample Konfabulator Widget1111111",
+                    "name": "main_window1111111",
+                    "width": 5001111111,
+                    "height": 5001111111
+                },
+                {
+                    "title": "Sample Konfabulator Widget1111111",
+                    "name": "main_window1111111",
+                    "width": 5001111111,
+                    "height": 5001111111
+                }
+    ]
         ],
         "size": 36,
         "style": "bold",

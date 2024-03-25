@@ -10,7 +10,7 @@ import Foundation
 class Test : PKHParser { 
 
     var widgetData: Widget?
-    var windowsList = [WindowsDataListItem]()
+    var windowsList = [[WindowsDataListItem]]()
     var style: String = ""
     var onMouseUp: String = ""
     var size: Int = 0
