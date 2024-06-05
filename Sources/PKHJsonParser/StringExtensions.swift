@@ -74,7 +74,7 @@ extension String {
     ///   Converts String to CGFloat
     public func toCGFloat() -> CGFloat {
         if let num = NumberFormatter().number(from: self) {
-            return CGFloat(num.floatValue)
+            return CGFloat(num.doubleValue)
         }
         else {
             return 0
