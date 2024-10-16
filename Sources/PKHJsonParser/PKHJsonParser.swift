@@ -21,25 +21,21 @@ public struct ParserMap {
 
 let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQueue", qos: .userInitiated, attributes: .concurrent)
 
-@objcMembers open class PKHParser: NSObject {
-    
+public protocol ParserAsyncInitProtocal {}
+extension ParserAsyncInitProtocal where Self: PKHParser {
+    public static func initAsync(map dic: [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping (Self) -> Void) {
+        guard let dic else { return }
+        ParserObjectConcurrentQueue.async {
+            let obj = Self.init(map: dic, anyData: anyData, serializeKey: serializeKey)
+            DispatchQueue.main.async { completionHandler(obj) }
+        }
+    }
+}
+
+
+@objcMembers open class PKHParser: NSObject, ParserAsyncInitProtocal {
     public override init() {
         super.init()
-    }
-    
-    //    public class func parser(map dic : [String: Any], anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping (ParserObject) -> Void) {
-    //        self.parser(map: dic, anyData: anyData, serializeKey: serializeKey, as: self, completionHandler: completionHandler)
-    //    }
-    
-    public class func initAsync<T:PKHParser>(map dic : [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping (T) -> Void) {
-        guard let dic = dic else { return }
-        ParserObjectConcurrentQueue.async {
-            let obj = T.init(map: dic, anyData: anyData, serializeKey: serializeKey)
-            DispatchQueue.main.async(execute: {
-                completionHandler(obj)
-            })
-        }
-        
     }
     
     required public init(map dic: [String: Any], anyData: Any? = nil, serializeKey: String? = nil) {
@@ -191,12 +187,6 @@ let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQu
         }
         result.append("✏️ ================== \(self.className) ===================== ✏️")
         return result.joined(separator: "\n")
-    }
-
-    private enum descriptionType {
-        case `default`
-        case array
-        case subInstance
     }
 
     private func getDescription(_ tapCount: UInt = 1, mirrored_object: Mirror) -> String {
