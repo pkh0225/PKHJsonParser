@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2041E2D22CE43D610034B1E2 /* JSONSerializable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2041E2D12CE43D560034B1E2 /* JSONSerializable.swift */; };
 		20AE480628AB897100EFBC9A /* PKHJsonParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE480328AB897100EFBC9A /* PKHJsonParser.swift */; };
 		20AE480728AB897100EFBC9A /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE480428AB897100EFBC9A /* StringExtensions.swift */; };
 		20AE480828AB897100EFBC9A /* NSObjectExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE480528AB897100EFBC9A /* NSObjectExtensions.swift */; };
@@ -45,6 +46,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2041E2D12CE43D560034B1E2 /* JSONSerializable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONSerializable.swift; sourceTree = "<group>"; };
 		20AE480328AB897100EFBC9A /* PKHJsonParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PKHJsonParser.swift; sourceTree = "<group>"; };
 		20AE480428AB897100EFBC9A /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		20AE480528AB897100EFBC9A /* NSObjectExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSObjectExtensions.swift; sourceTree = "<group>"; };
@@ -108,6 +110,7 @@
 		20AE480228AB897100EFBC9A /* PKHJsonParser */ = {
 			isa = PBXGroup;
 			children = (
+				2041E2D12CE43D560034B1E2 /* JSONSerializable.swift */,
 				20AE480328AB897100EFBC9A /* PKHJsonParser.swift */,
 				20AE480428AB897100EFBC9A /* StringExtensions.swift */,
 				20AE480528AB897100EFBC9A /* NSObjectExtensions.swift */,
@@ -321,6 +324,7 @@
 				52C9909B26C0B390009F3453 /* TestText.swift in Sources */,
 				52C9909726C0B390009F3453 /* Test.swift in Sources */,
 				20AE480728AB897100EFBC9A /* StringExtensions.swift in Sources */,
+				2041E2D22CE43D610034B1E2 /* JSONSerializable.swift in Sources */,
 				52C9909826C0B390009F3453 /* TestImage.swift in Sources */,
 				52C9905C26C0B2FD009F3453 /* SceneDelegate.swift in Sources */,
 				52C9909926C0B390009F3453 /* WindowsDataListItem.swift in Sources */,

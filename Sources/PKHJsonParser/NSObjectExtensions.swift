@@ -9,15 +9,35 @@
 import Foundation
 import UIKit
 
-public class ObjectInfoMap {
-    public var ivarInfoList: [IvarInfo]
-    
-    public init(ivarInfoList: [IvarInfo]) {
+final class ObjectInfoMap {
+    let ivarInfoList: [IvarInfo]
+
+    init(ivarInfoList: [IvarInfo]) {
         self.ivarInfoList = ivarInfoList
     }
 }
 
-public var Object_Info_Cache = NSCache<NSString, ObjectInfoMap>()
+final class CacheManager {
+    nonisolated(unsafe) static let shared = CacheManager()
+    private var cache = NSCache<NSString, ObjectInfoMap>()
+    private let queue = DispatchQueue(label: "com.cacheManager.queue")
+
+    init() {
+        cache.countLimit = 500
+    }
+
+    func setObject(_ obj: ObjectInfoMap, forKey key: NSString) {
+        queue.sync {
+            cache.setObject(obj, forKey: key)
+        }
+    }
+
+    func object(forKey key: NSString) -> ObjectInfoMap? {
+        return queue.sync {
+            cache.object(forKey: key)
+        }
+    }
+}
 
 @inline(__always) public func swiftClassFromString(_ className: String, bundleName: String = "") -> AnyClass? {
     
@@ -40,8 +60,8 @@ public var Object_Info_Cache = NSCache<NSString, ObjectInfoMap>()
     return nil
 }
 
-public struct  IvarInfo {
-    public enum IvarInfoClassType: String {
+struct  IvarInfo {
+    enum IvarInfoClassType: String {
         case any
         case array
         case dictionary
@@ -59,10 +79,10 @@ public struct  IvarInfo {
         }
     }
     
-    public var label: String = ""
-    public var classType: IvarInfoClassType = .exceptType
-    public var subClassType: AnyClass?
-    public var subValueType: IvarInfoClassType = .exceptType
+    var label: String = ""
+    var classType: IvarInfoClassType = .exceptType
+    var subClassType: AnyClass?
+    var subValueType: IvarInfoClassType = .exceptType
 
 //    public init(label: String, classType: IvarInfoClassType, subClassType: AnyClass?, value: Any?) {
 //        self.label = label
@@ -130,7 +150,7 @@ public struct  IvarInfo {
 
 
 
-@inline(__always) public func getIvarInfoList(_ classType: NSObject.Type) -> [IvarInfo] {
+@inline(__always) func getIvarInfoList(_ classType: NSObject.Type) -> [IvarInfo] {
     
     
     let mirror = Mirror(reflecting: classType.init())
@@ -218,16 +238,15 @@ extension NSObject {
         return getDictionaryExcludSuper(mirrored_object: mirrored_object)
     }
 
-    @inline(__always) public func ivarInfoList() -> [IvarInfo] {
+    @inline(__always) func ivarInfoList() -> [IvarInfo] {
 //        print(String(describing: type(of:self)))
-        Object_Info_Cache.countLimit = 100
-        if let info: ObjectInfoMap = Object_Info_Cache.object(forKey: self.className as NSString) {
+        if let info = CacheManager.shared.object(forKey: self.className as NSString) {
             return info.ivarInfoList
         }
         else {
             let infoList: [IvarInfo] = getIvarInfoList(type(of: self))
             let info: ObjectInfoMap = ObjectInfoMap(ivarInfoList: infoList )
-            Object_Info_Cache.setObject(info, forKey: self.className as NSString)
+            CacheManager.shared.setObject(info, forKey: self.className as NSString)
             return infoList
         }
 //        return getIvarInfoList(type(of:self))
@@ -236,9 +255,9 @@ extension NSObject {
 
 extension NSObject {
     private struct AssociatedKeys {
-        static var className: UInt8 = 0
-        static var iVarName: UInt8 = 0
-        static var iVarValue: UInt8 = 0
+        nonisolated(unsafe) static var className: UInt8 = 0
+        nonisolated(unsafe) static var iVarName: UInt8 = 0
+        nonisolated(unsafe) static var iVarValue: UInt8 = 0
     }
     
     public var toInt: Int {

@@ -19,21 +19,28 @@ public struct ParserMap {
     }
 }
 
+/// Helps compiler accept valid code it can't validate.
+struct UncheckedSendableWrapper<Value, Value2>: @unchecked Sendable {
+    let value: Value
+    let value2: Value2
+}
+
 let ParserObjectConcurrentQueue = DispatchQueue(label: "ParserObjectConcurrentQueue", qos: .userInitiated, attributes: .concurrent)
 
 public protocol ParserAsyncInitProtocal {}
 extension ParserAsyncInitProtocal where Self: PKHParser {
-    public static func initAsync(map dic: [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping (Self) -> Void) {
+    public static func initAsync(map dic: [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil, completionHandler: @escaping @Sendable (Self) -> Void) {
         guard let dic else { return }
+        let work = UncheckedSendableWrapper(value: dic, value2: anyData)
         ParserObjectConcurrentQueue.async {
-            let obj = Self.init(map: dic, anyData: anyData, serializeKey: serializeKey)
+            let obj = Self.init(map: work.value, anyData: work.value2, serializeKey: serializeKey)
             DispatchQueue.main.async { completionHandler(obj) }
         }
     }
 }
 
 
-@objcMembers open class PKHParser: NSObject, ParserAsyncInitProtocal {
+@objcMembers open class PKHParser: NSObject, JSONSerializable, ParserAsyncInitProtocal {
     public override init() {
         super.init()
     }

@@ -104,17 +104,29 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        let dic = jsonString.toDictionary()
-        let obj = Test(map: dic!)
-        print(obj)
+
     }
 
 
     @IBAction func onTest(_ sender: UIButton) {
         let dic = jsonString.toDictionary()
+        let obj = Test(map: dic!)
+        print(obj)
+    }
+
+    @IBAction func onAsync(_ sender: Any) {
+        let dic = jsonString.toDictionary()
         Test.initAsync(map: dic!) {
             print($0)
         }
     }
+    
+    @IBAction func onToJson(_ sender: UIButton) {
+        let dic = jsonString.toDictionary()
+        Test.initAsync(map: dic!) {
+            print($0.toJSON() ?? "")
+        }
+    }
+    
 }
 
