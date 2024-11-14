@@ -142,7 +142,7 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                 self.setValue(data, forKey: ivarItem.label)
             }
             else if ivarItem.classType == .any {
-                print("\n debug parser AnyType label: \(ivarItem.label) type: \(String(describing: type(of: value))), value: \(value)\n")
+//                print("\n debug parser AnyType label: \(ivarItem.label) type: \(String(describing: type(of: value))), value: \(value)\n")
                 self.setValue(value, forKey: ivarItem.label)
             }
             else if ivarItem.classType == .exceptType {

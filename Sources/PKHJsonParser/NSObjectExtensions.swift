@@ -9,7 +9,7 @@
 import Foundation
 import UIKit
 
-final class ObjectInfoMap {
+actor ObjectInfoMap: Sendable {
     let ivarInfoList: [IvarInfo]
 
     init(ivarInfoList: [IvarInfo]) {
@@ -17,24 +17,24 @@ final class ObjectInfoMap {
     }
 }
 
-final class CacheManager {
-    nonisolated(unsafe) static let shared = CacheManager()
-    private var cache = NSCache<NSString, ObjectInfoMap>()
+final class CacheManager: Sendable {
+    static let shared = CacheManager()
+    nonisolated(unsafe) private var cache = NSCache<NSString, ObjectInfoMap>()
     private let queue = DispatchQueue(label: "com.cacheManager.queue")
 
     init() {
-        cache.countLimit = 500
+        self.cache.countLimit = 500
     }
 
-    func setObject(_ obj: ObjectInfoMap, forKey key: NSString) {
-        queue.sync {
-            cache.setObject(obj, forKey: key)
+    func setObject(_ obj: ObjectInfoMap, forKey key: String) {
+        self.queue.async(flags: .barrier) {
+            self.cache.setObject(obj, forKey: key as NSString)
         }
     }
 
-    func object(forKey key: NSString) -> ObjectInfoMap? {
+    func object(forKey key: String) -> ObjectInfoMap? {
         return queue.sync {
-            cache.object(forKey: key)
+            self.cache.object(forKey: key as NSString)
         }
     }
 }
@@ -240,13 +240,13 @@ extension NSObject {
 
     @inline(__always) func ivarInfoList() -> [IvarInfo] {
 //        print(String(describing: type(of:self)))
-        if let info = CacheManager.shared.object(forKey: self.className as NSString) {
+        if let info = CacheManager.shared.object(forKey: self.className) {
             return info.ivarInfoList
         }
         else {
             let infoList: [IvarInfo] = getIvarInfoList(type(of: self))
             let info: ObjectInfoMap = ObjectInfoMap(ivarInfoList: infoList )
-            CacheManager.shared.setObject(info, forKey: self.className as NSString)
+            CacheManager.shared.setObject(info, forKey: self.className)
             return infoList
         }
 //        return getIvarInfoList(type(of:self))
