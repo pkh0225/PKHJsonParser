@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 
 public struct ParserMap {
     var ivar: String

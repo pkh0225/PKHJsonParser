@@ -6,6 +6,8 @@
 */
 
 import Foundation
+import PKHJsonParser
+
 enum TestEmum: String {
     case aaa
     case bbb

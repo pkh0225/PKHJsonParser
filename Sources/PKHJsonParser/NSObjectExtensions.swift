@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import UIKit
 
 actor ObjectInfoMap: Sendable {
     let ivarInfoList: [IvarInfo]
@@ -33,7 +32,7 @@ final class CacheManager: Sendable {
     }
 
     func object(forKey key: String) -> ObjectInfoMap? {
-        return queue.sync {
+        return self.queue.sync {
             self.cache.object(forKey: key as NSString)
         }
     }

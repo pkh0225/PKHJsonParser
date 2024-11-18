@@ -3,15 +3,12 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 60;
 	objects = {
 
 /* Begin PBXBuildFile section */
-		2041E2D22CE43D610034B1E2 /* JSONSerializable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2041E2D12CE43D560034B1E2 /* JSONSerializable.swift */; };
-		20AE480628AB897100EFBC9A /* PKHJsonParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE480328AB897100EFBC9A /* PKHJsonParser.swift */; };
-		20AE480728AB897100EFBC9A /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE480428AB897100EFBC9A /* StringExtensions.swift */; };
-		20AE480828AB897100EFBC9A /* NSObjectExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20AE480528AB897100EFBC9A /* NSObjectExtensions.swift */; };
 		20AE480A28AB8B5C00EFBC9A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 20AE480928AB8B5C00EFBC9A /* README.md */; };
+		20DE3CFC2CEAFA5E00B5F86A /* PKHJsonParser in Frameworks */ = {isa = PBXBuildFile; productRef = 20DE3CFB2CEAFA5E00B5F86A /* PKHJsonParser */; };
 		52C9905A26C0B2FD009F3453 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C9905926C0B2FD009F3453 /* AppDelegate.swift */; };
 		52C9905C26C0B2FD009F3453 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C9905B26C0B2FD009F3453 /* SceneDelegate.swift */; };
 		52C9905E26C0B2FD009F3453 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C9905D26C0B2FD009F3453 /* ViewController.swift */; };
@@ -46,10 +43,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2041E2D12CE43D560034B1E2 /* JSONSerializable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JSONSerializable.swift; sourceTree = "<group>"; };
-		20AE480328AB897100EFBC9A /* PKHJsonParser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PKHJsonParser.swift; sourceTree = "<group>"; };
-		20AE480428AB897100EFBC9A /* StringExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
-		20AE480528AB897100EFBC9A /* NSObjectExtensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NSObjectExtensions.swift; sourceTree = "<group>"; };
 		20AE480928AB8B5C00EFBC9A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		52C9905626C0B2FD009F3453 /* PKHParserTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PKHParserTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52C9905926C0B2FD009F3453 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -78,6 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				20DE3CFC2CEAFA5E00B5F86A /* PKHJsonParser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -98,31 +92,10 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		20AE480128AB897100EFBC9A /* Sources */ = {
-			isa = PBXGroup;
-			children = (
-				20AE480228AB897100EFBC9A /* PKHJsonParser */,
-			);
-			name = Sources;
-			path = ../Sources;
-			sourceTree = "<group>";
-		};
-		20AE480228AB897100EFBC9A /* PKHJsonParser */ = {
-			isa = PBXGroup;
-			children = (
-				2041E2D12CE43D560034B1E2 /* JSONSerializable.swift */,
-				20AE480328AB897100EFBC9A /* PKHJsonParser.swift */,
-				20AE480428AB897100EFBC9A /* StringExtensions.swift */,
-				20AE480528AB897100EFBC9A /* NSObjectExtensions.swift */,
-			);
-			path = PKHJsonParser;
-			sourceTree = "<group>";
-		};
 		52C9904D26C0B2FD009F3453 = {
 			isa = PBXGroup;
 			children = (
 				20AE480928AB8B5C00EFBC9A /* README.md */,
-				20AE480128AB897100EFBC9A /* Sources */,
 				52C9909026C0B390009F3453 /* TestClass */,
 				52C9905826C0B2FD009F3453 /* PKHParserTest */,
 				52C9906F26C0B2FE009F3453 /* PKHParserTestTests */,
@@ -273,6 +246,9 @@
 				Base,
 			);
 			mainGroup = 52C9904D26C0B2FD009F3453;
+			packageReferences = (
+				20DE3CFA2CEAFA5E00B5F86A /* XCLocalSwiftPackageReference "../../PKHJsonParser" */,
+			);
 			productRefGroup = 52C9905726C0B2FD009F3453 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -319,17 +295,13 @@
 			files = (
 				52C9909A26C0B390009F3453 /* WindowT.swift in Sources */,
 				52C9905E26C0B2FD009F3453 /* ViewController.swift in Sources */,
-				20AE480628AB897100EFBC9A /* PKHJsonParser.swift in Sources */,
 				52C9905A26C0B2FD009F3453 /* AppDelegate.swift in Sources */,
 				52C9909B26C0B390009F3453 /* TestText.swift in Sources */,
 				52C9909726C0B390009F3453 /* Test.swift in Sources */,
-				20AE480728AB897100EFBC9A /* StringExtensions.swift in Sources */,
-				2041E2D22CE43D610034B1E2 /* JSONSerializable.swift in Sources */,
 				52C9909826C0B390009F3453 /* TestImage.swift in Sources */,
 				52C9905C26C0B2FD009F3453 /* SceneDelegate.swift in Sources */,
 				52C9909926C0B390009F3453 /* WindowsDataListItem.swift in Sources */,
 				52C9909C26C0B390009F3453 /* Widget.swift in Sources */,
-				20AE480828AB897100EFBC9A /* NSObjectExtensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -508,13 +480,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LW3F5LSN8X;
 				INFOPLIST_FILE = PKHParserTest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.beta.PKHParserTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -527,13 +500,14 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LW3F5LSN8X;
 				INFOPLIST_FILE = PKHParserTest/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.beta.PKHParserTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -662,6 +636,20 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		20DE3CFA2CEAFA5E00B5F86A /* XCLocalSwiftPackageReference "../../PKHJsonParser" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../PKHJsonParser;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		20DE3CFB2CEAFA5E00B5F86A /* PKHJsonParser */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PKHJsonParser;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 52C9904E26C0B2FD009F3453 /* Project object */;
 }

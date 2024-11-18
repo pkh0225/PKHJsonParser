@@ -6,6 +6,7 @@
 */
 
 import Foundation
+import PKHJsonParser
 
 class TestText : PKHParser { 
 
