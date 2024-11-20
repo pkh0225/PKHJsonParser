@@ -7,8 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		200EB45F2CEDB6700011BD7B /* PKHJsonParser in Frameworks */ = {isa = PBXBuildFile; productRef = 200EB45E2CEDB6700011BD7B /* PKHJsonParser */; };
 		20AE480A28AB8B5C00EFBC9A /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = 20AE480928AB8B5C00EFBC9A /* README.md */; };
-		20DE3CFC2CEAFA5E00B5F86A /* PKHJsonParser in Frameworks */ = {isa = PBXBuildFile; productRef = 20DE3CFB2CEAFA5E00B5F86A /* PKHJsonParser */; };
 		52C9905A26C0B2FD009F3453 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C9905926C0B2FD009F3453 /* AppDelegate.swift */; };
 		52C9905C26C0B2FD009F3453 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C9905B26C0B2FD009F3453 /* SceneDelegate.swift */; };
 		52C9905E26C0B2FD009F3453 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 52C9905D26C0B2FD009F3453 /* ViewController.swift */; };
@@ -71,7 +71,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				20DE3CFC2CEAFA5E00B5F86A /* PKHJsonParser in Frameworks */,
+				200EB45F2CEDB6700011BD7B /* PKHJsonParser in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,6 +92,13 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		200EB45D2CEDB6700011BD7B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		52C9904D26C0B2FD009F3453 = {
 			isa = PBXGroup;
 			children = (
@@ -100,6 +107,7 @@
 				52C9905826C0B2FD009F3453 /* PKHParserTest */,
 				52C9906F26C0B2FE009F3453 /* PKHParserTestTests */,
 				52C9907A26C0B2FE009F3453 /* PKHParserTestUITests */,
+				200EB45D2CEDB6700011BD7B /* Frameworks */,
 				52C9905726C0B2FD009F3453 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -247,7 +255,7 @@
 			);
 			mainGroup = 52C9904D26C0B2FD009F3453;
 			packageReferences = (
-				20DE3CFA2CEAFA5E00B5F86A /* XCLocalSwiftPackageReference "../../PKHJsonParser" */,
+				200EB45C2CEDB6600011BD7B /* XCLocalSwiftPackageReference "../../PKHJsonParser" */,
 			);
 			productRefGroup = 52C9905726C0B2FD009F3453 /* Products */;
 			projectDirPath = "";
@@ -638,15 +646,16 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		20DE3CFA2CEAFA5E00B5F86A /* XCLocalSwiftPackageReference "../../PKHJsonParser" */ = {
+		200EB45C2CEDB6600011BD7B /* XCLocalSwiftPackageReference "../../PKHJsonParser" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = ../../PKHJsonParser;
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		20DE3CFB2CEAFA5E00B5F86A /* PKHJsonParser */ = {
+		200EB45E2CEDB6700011BD7B /* PKHJsonParser */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 200EB45C2CEDB6600011BD7B /* XCLocalSwiftPackageReference "../../PKHJsonParser" */;
 			productName = PKHJsonParser;
 		};
 /* End XCSwiftPackageProductDependency section */
