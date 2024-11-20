@@ -8,7 +8,7 @@
 
 import Foundation
 
-actor ObjectInfoMap: Sendable {
+actor ObjectInfoMap {
     let ivarInfoList: [IvarInfo]
 
     init(ivarInfoList: [IvarInfo]) {
