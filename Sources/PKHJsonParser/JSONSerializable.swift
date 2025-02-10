@@ -8,22 +8,14 @@
 import Foundation
 
 public protocol JSONSerializable {
-    var debug: Bool { get }
     var JSONRepresentation: [String: Any] { get }
 }
 
 extension JSONSerializable {
-    public var debug: Bool { false }
     public var JSONRepresentation: [String: Any] {
         var representation: [String: Any] = [String: Any]()
 
         let mirrored_object: Mirror = Mirror(reflecting: self)
-
-//        if debug {
-//            for case let (label?, value) in mirrored_object.children {
-//                print("label: \(label), value: \(value)")
-//            }
-//        }
 
         representation = getMirrorToDic(mirrored_object: mirrored_object)
 
@@ -31,11 +23,9 @@ extension JSONSerializable {
     }
 
     private func getMirrorToDic(mirrored_object: Mirror) -> [String: Any] {
-//        print("mirrored_object: \(mirrored_object)")
         var representation: [String: Any] = [String: Any]()
 
         for case let (label?, value) in mirrored_object.children {
-//            print("label: \(label), value: \(value)")
 
             let mir = Mirror(reflecting: value)
             if mir.displayStyle == .enum {
@@ -48,8 +38,8 @@ extension JSONSerializable {
                 case let value as [Any]:
                     var addArray = [Any]()
                     for item in value {
-                        if let subArray = item as? [JSONSerializable] {
-                            var addSubArray = [[String: Any]]()
+                        if let subArray: [JSONSerializable] = item as? [JSONSerializable] {
+                            var addSubArray: [[String: Any]] = [[String: Any]]()
                             for subItem: JSONSerializable in subArray {
                                 let dic = subItem.JSONRepresentation
                                 if dic.isEmpty == false {
@@ -61,18 +51,21 @@ extension JSONSerializable {
                             }
 
                         }
-                        else if let strArray = item as? String {
-                            if strArray.isEmpty == false {
-                                addArray.append(strArray)
+                        else if let item = item as? NSNumber {
+                            addArray.append(item)
+                        }
+                        else if let item = item as? String {
+                            if item.isEmpty == false {
+                                addArray.append(item)
                             }
                         }
-                        else if let item: JSONSerializable = item as? JSONSerializable {
+                        else if let item = item as? JSONSerializable {
                             let dic = item.JSONRepresentation
                             if dic.isEmpty == false {
                                 addArray.append(dic)
                             }
                         }
-                        else if let dic = item as? [String: Any] {
+                        else if let dic = item as? [String: String] {
                             if dic.isEmpty == false {
                                 addArray.append(dic)
                             }
@@ -94,6 +87,9 @@ extension JSONSerializable {
                         representation[label] = value.JSONRepresentation
                     }
 
+                case let value as NSNumber:
+                    representation[label] = value
+
                 case let value as AnyObject:
                     representation[label] = "\(value)"
 
@@ -108,7 +104,11 @@ extension JSONSerializable {
 
         if let parent: Mirror = mirrored_object.superclassMirror {
             let dic: [String: Any] = getMirrorToDic(mirrored_object: parent)
-            dic.forEach { representation[$0.key] = $0.value }
+            if dic.isEmpty == false {
+                for (k, v) in dic {
+                    representation.updateValue(v, forKey: k)
+                }
+            }
 
         }
         return representation
@@ -124,7 +124,8 @@ extension JSONSerializable {
         }
 
         do {
-            let data = try JSONSerialization.data(withJSONObject: representation, options: [.prettyPrinted, .sortedKeys])
+            let data = try JSONSerialization.data(withJSONObject: representation, options: [.prettyPrinted])
+//            print(String(data: data, encoding: String.Encoding.utf8))
             return String(data: data, encoding: String.Encoding.utf8)
         }
         catch {

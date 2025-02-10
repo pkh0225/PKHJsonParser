@@ -36,6 +36,18 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
             DispatchQueue.main.async { completionHandler(obj) }
         }
     }
+
+    public static func initAsync(map dic: [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil) async -> Self {
+        guard let dic = dic else { return Self.init(map: [:]) }
+        // 비동기적으로 작업을 처리하고 결과를 반환
+        let obj = await withCheckedContinuation { continuation in
+            Task {
+                let obj = Self.init(map: dic, anyData: anyData, serializeKey: serializeKey)
+                continuation.resume(returning: obj)
+            }
+        }
+        return obj
+    }
 }
 
 
@@ -191,7 +203,7 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
         if str.isValid {
             result.append("\t\(str)")
         }
-        result.append("✏️ ================== \(self.className) ===================== ✏️")
+        result.append("✏️ ======== \(self.className) ======== ✏️")
         return result.joined(separator: "\n")
     }
 

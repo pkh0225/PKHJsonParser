@@ -39,24 +39,22 @@ final class CacheManager: Sendable {
 }
 
 @inline(__always) public func swiftClassFromString(_ className: String, bundleName: String = "") -> AnyClass? {
-    
-    // get the project name
-    if  let appName = Bundle.main.object(forInfoDictionaryKey:"CFBundleName") as? String {
-        // generate the full name of your class (take a look into your "YourProject-swift.h" file)
-        let classStringName = "\(appName).\(className)"
-        guard let aClass = NSClassFromString(classStringName) else {
-            let classStringName = "\(bundleName).\(className)"
-            guard let aClass = NSClassFromString(classStringName) else {
-                //                print(">>>>>>>>>>>>> [ \(className) ] : swiftClassFromString Create Fail <<<<<<<<<<<<<<")
-                return nil
-                
-            }
-            return aClass
-        }
-        return aClass
+    func subFunc(className: String, bundleName: String) -> AnyClass? {
+        guard !className.isEmpty, !bundleName.isEmpty else { return nil }
+        return NSClassFromString("\(bundleName).\(className)")
     }
-    //    print(">>>>>>>>>>>>> [ \(className) ] : swiftClassFromString Create Fail <<<<<<<<<<<<<<")
-    return nil
+    if !bundleName.isEmpty, let classTyp = subFunc(className: className, bundleName: bundleName) {
+        return classTyp
+    }
+    else if let bundleName = Bundle.main.object(forInfoDictionaryKey:"CFBundleName") as? String,
+       let classTyp = subFunc(className: className, bundleName: bundleName) {
+        return classTyp
+    }
+    else if let bundleName = Bundle.allBundles.first(where: { $0.bundlePath.contains(".xctest") })?.bundleIdentifier?.split(separator: ".").last,
+            let classTyp = subFunc(className: className, bundleName: String(bundleName)) {
+        return classTyp
+    }
+    return subFunc(className: className, bundleName: bundleName)
 }
 
 struct  IvarInfo {
@@ -150,8 +148,6 @@ struct  IvarInfo {
 
 
 @inline(__always) func getIvarInfoList(_ classType: NSObject.Type) -> [IvarInfo] {
-    
-    
     let mirror = Mirror(reflecting: classType.init())
     var ivarDataList = [IvarInfo]()
     ivarDataList.reserveCapacity(mirror.children.count)
@@ -220,9 +216,6 @@ struct  IvarInfo {
             ivarDataList += superIvarDataList
         }
     }
-    
-    
-    
     return ivarDataList
 }
 
@@ -257,28 +250,7 @@ extension NSObject {
         nonisolated(unsafe) static var iVarName: UInt8 = 0
         nonisolated(unsafe) static var iVarValue: UInt8 = 0
     }
-    
-    public var toInt: Int {
-        return unsafeBitCast(self, to: Int.self)
-    }
-    
-    public var tag_name: String? {
-        get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.iVarName) as? String
-        }
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.iVarName, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-    public var tag_value: Any? {
-        get {
-            return objc_getAssociatedObject(self, &AssociatedKeys.iVarValue)
-        }
-        set {
-            objc_setAssociatedObject(self, &AssociatedKeys.iVarValue, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-        }
-    }
-    
+
     public var className: String { String(describing: type(of:self)) }
     public class var className: String { String(describing: self) }
 }

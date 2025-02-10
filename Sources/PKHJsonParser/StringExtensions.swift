@@ -84,7 +84,7 @@ extension String {
     ///   Converts String to Bool
     public func toBool() -> Bool {
         let trimmedString = trimmed().lowercased()
-        if trimmedString == "true" || trimmedString == "Y" || trimmedString == "y" || trimmedString == "True" {
+        if trimmedString == "true" || trimmedString == "y" || trimmedString == "yes" {
             return true
         }
         else {
@@ -92,7 +92,6 @@ extension String {
         }
     }
 
-    
     public func toDictionary() -> [String: Any]? {
         if let data = self.data(using: .utf8) {
             do {
@@ -103,7 +102,5 @@ extension String {
         }
         return nil
     }
-    
-
 }
 
