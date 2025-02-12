@@ -2,7 +2,27 @@ import Testing
 import Foundation
 @testable import PKHJsonParser
 
+// 함수로 빼서 Test
+func assertIvarInfo(
+    _ iVarInfo: IvarInfo?,
+    label: String,
+    classType: IvarInfo.IvarInfoClassType,
+    subClassType: AnyClass?,
+    subValueType: IvarInfo.IvarInfoClassType
+) throws {
+    let iVarInfo = try #require(iVarInfo)
 
+    #expect(iVarInfo.label == label) // label 비교
+    #expect(iVarInfo.classType == classType) // classType 비교
+
+    if let expectedSubClassType = subClassType {
+        #expect(expectedSubClassType is TestParserSubClass.Type) // subclass type 비교
+    } else {
+        #expect(iVarInfo.subClassType == nil) // nil 인 경우 확인
+    }
+
+    #expect(iVarInfo.subValueType == subValueType) // subValueType 비교
+}
 
 struct IvarInfoTest {
     struct TestClassType {
@@ -17,6 +37,12 @@ struct IvarInfoTest {
             #expect(iVarInfo.classType == .class)
             #expect(iVarInfo.subClassType is TestParserSubClass.Type)
             #expect(iVarInfo.subValueType == .exceptType)
+
+            try assertIvarInfo(getIvarInfoList(TestParserClass.self).first,
+                           label: "a",
+                           classType: .class,
+                           subClassType: TestParserSubClass.self,
+                           subValueType: .exceptType)
         }
     }
     struct TestArray {
