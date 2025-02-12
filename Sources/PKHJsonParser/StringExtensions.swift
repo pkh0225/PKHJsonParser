@@ -17,16 +17,11 @@ import UIKit
 
 extension String {
     public var isValid: Bool {
-        if self.isEmpty || self.trim().isEmpty || self == "(null)" || self == "null" || self == "nil" {
-            return false
-        }
-
-        return true
+        return !(self.isEmpty || self.trim().isEmpty || self == "(null)" || self == "null" || self == "nil")
     }
 
     public func trim() -> String {
-        let str: String = self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
-        return str
+        return self.trimmingCharacters(in: CharacterSet.whitespacesAndNewlines)
     }
 
     public func contains(_ find: String) -> Bool {
@@ -37,70 +32,34 @@ extension String {
         return self.replacingOccurrences(of: of, with: with, options: .literal, range: nil)
     }
     
-    ///   Trims white space and new line characters, returns a new string
     public func trimmed() -> String {
         return self.trimmingCharacters(in: .whitespacesAndNewlines)
     }
     
     public func toInt() -> Int {
-        if let num = NumberFormatter().number(from: self) {
-            return num.intValue
-        }
-        else {
-            return 0
-        }
+        return NumberFormatter().number(from: self)?.intValue ?? 0
     }
     
-    ///   Converts String to Double
     public func toDouble() -> Double {
-        if let num = NumberFormatter().number(from: self) {
-            return num.doubleValue
-        }
-        else {
-            return 0
-        }
+        return NumberFormatter().number(from: self)?.doubleValue ?? 0
     }
     
-    ///   Converts String to Float
     public func toFloat() -> Float {
-        if let num = NumberFormatter().number(from: self) {
-            return num.floatValue
-        }
-        else {
-            return 0
-        }
+        return NumberFormatter().number(from: self)?.floatValue ?? 0
     }
     
-    ///   Converts String to CGFloat
     public func toCGFloat() -> CGFloat {
-        if let num = NumberFormatter().number(from: self) {
-            return CGFloat(num.doubleValue)
-        }
-        else {
-            return 0
-        }
+        return CGFloat(NumberFormatter().number(from: self)?.doubleValue ?? 0)
     }
     
-    ///   Converts String to Bool
     public func toBool() -> Bool {
         let trimmedString = trimmed().lowercased()
-        if trimmedString == "true" || trimmedString == "y" || trimmedString == "yes" {
-            return true
-        }
-        else {
-            return false
-        }
+        return (trimmedString == "true" || trimmedString == "y" || trimmedString == "yes")
     }
 
     public func toDictionary() -> [String: Any]? {
-        if let data = self.data(using: .utf8) {
-            do {
-                return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
-            } catch {
-                print(error.localizedDescription)
-            }
-        }
-        return nil
+        guard let data = self.data(using: .utf8) else { return nil }
+        return try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
     }
 }
 
