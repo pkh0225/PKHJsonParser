@@ -17,7 +17,7 @@ import UIKit
 
 extension String {
     public var isValid: Bool {
-        if self.isEmpty || self.count == 0 || self.trim().count == 0 || self == "(null)" || self == "null" || self == "nil" {
+        if self.isEmpty || self.trim().isEmpty || self == "(null)" || self == "null" || self == "nil" {
             return false
         }
 
