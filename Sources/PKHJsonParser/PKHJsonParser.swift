@@ -139,7 +139,7 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                 }
 
             }
-            else if ivarItem.classType == .dictionary {
+            else if ivarItem.classType == .class {
                 guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
 //                    assertionFailure("self : [\(self.className)] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
                     continue

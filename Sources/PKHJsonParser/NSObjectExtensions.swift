@@ -43,6 +43,7 @@ final class CacheManager: Sendable {
         guard !className.isEmpty, !bundleName.isEmpty else { return nil }
         return NSClassFromString("\(bundleName).\(className)")
     }
+
     if !bundleName.isEmpty, let classTyp = subFunc(className: className, bundleName: bundleName) {
         return classTyp
     }
@@ -61,7 +62,7 @@ struct  IvarInfo {
     enum IvarInfoClassType: String {
         case any
         case array
-        case dictionary
+        case `class`
         case int
         case string
         case float
@@ -78,7 +79,7 @@ struct  IvarInfo {
     
     var label: String = ""
     var classType: IvarInfoClassType = .exceptType
-    var subClassType: AnyClass?
+    var subClassType: AnyClass? = nil
     var subValueType: IvarInfoClassType = .exceptType
 
 //    public init(label: String, classType: IvarInfoClassType, subClassType: AnyClass?, value: Any?) {
@@ -161,49 +162,49 @@ struct  IvarInfo {
         var className = String(describing: type(of: value))
         
         if className.contains("Array<Any>") || className.contains(".Type") || className.contains("Dictionary<") || className.contains("Optional<Any>") || className.contains("Optional<AnyObject>") {
-            ivarDataList.append( IvarInfo(label: label, classType: .any, subClassType: nil) )
+            ivarDataList.append( IvarInfo(label: label, classType: .any))
         }
         else if className.contains("Array<") {
-            className = className.replace(">", "")
-            className = className.replace("Array<", "")
-            if className == "String" || className == "Int" || className == "CGFloat" || className == "Float" || className == "Double" || className == "Bool" {
-                ivarDataList.append( IvarInfo(label: label, classType: .array, subValueType: IvarInfo.IvarInfoClassType(string: className)) )
+            var elementName = className.replace(">", "")
+            elementName = elementName.replace("Array<", "")
+            if elementName == "String" || elementName == "Int" || elementName == "CGFloat" || elementName == "Float" || elementName == "Double" || elementName == "Bool" {
+                ivarDataList.append( IvarInfo(label: label, classType: .array, subValueType: IvarInfo.IvarInfoClassType(string: elementName)) )
             }
             else {
-                ivarDataList.append( IvarInfo(label: label, classType: .array, subClassType: swiftClassFromString(className)) )
+                ivarDataList.append( IvarInfo(label: label, classType: .array, subClassType: swiftClassFromString(elementName)) )
             }
         }
         else if className.contains("Optional<") || className.contains("ImplicitlyUnwrappedOptional<") {
             className = className.replace(">", "")
             className = className.replace("ImplicitlyUnwrappedOptional<", "")
             className = className.replace("Optional<", "")
-            ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className)) )
+            ivarDataList.append( IvarInfo(label: label, classType: .class, subClassType: swiftClassFromString(className)) )
         }
         else {
             if value is String {
-                ivarDataList.append( IvarInfo(label: label, classType: .string, subClassType: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .string) )
             }
             else if value is Int {
-                ivarDataList.append( IvarInfo(label: label, classType: .int, subClassType: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .int) )
             }
             else if value is Float {
-                ivarDataList.append( IvarInfo(label: label, classType: .float, subClassType: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .float) )
             }
             else if value is CGFloat {
-                ivarDataList.append( IvarInfo(label: label, classType: .cgfloat, subClassType: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .cgfloat) )
             }
             else if value is Double {
-                ivarDataList.append( IvarInfo(label: label, classType: .double, subClassType: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .double) )
             }
             else if value is Bool {
-                ivarDataList.append( IvarInfo(label: label, classType: .bool, subClassType: nil) )
+                ivarDataList.append( IvarInfo(label: label, classType: .bool) )
             }
             else {
                 if (Mirror(reflecting: value).displayStyle == .class) {
-                    ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className)) )
+                    ivarDataList.append( IvarInfo(label: label, classType: .class, subClassType: swiftClassFromString(className)) )
                 }
                 else {
-                     ivarDataList.append( IvarInfo(label: label, classType: .exceptType, subClassType: nil) )
+                     ivarDataList.append( IvarInfo(label: label, classType: .exceptType) )
                 }
             }
         }
@@ -246,11 +247,6 @@ extension NSObject {
 }
 
 extension NSObject {
-    private struct AssociatedKeys {
-        nonisolated(unsafe) static var iVarName: UInt8 = 0
-        nonisolated(unsafe) static var iVarValue: UInt8 = 0
-    }
-
     public var className: String { String(describing: type(of:self)) }
     public class var className: String { String(describing: self) }
 }

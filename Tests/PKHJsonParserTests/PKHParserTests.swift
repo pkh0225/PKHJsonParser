@@ -2,37 +2,9 @@ import Testing
 import Foundation
 @testable import PKHJsonParser
 
-// 커스텀 파서 객체 생성
-class TestParserClass: PKHParser {
-    var stringType: String = ""
-    var intType: Int = 0
-    var boolType: Bool = false
-    var CGFloatType: CGFloat = 0
-    var classType: TestParserSubClass?
-
-    var arrayStringType: [String] = []
-    var arrayIntType: [Int] = []
-    var arrayCGFloatType: [CGFloat] = []
-    var arraySubClassType: [TestParserSubClass] = []
-
-    override func getDataMap() -> [ParserMap]? {
-        return [
-            ParserMap(ivar: "stringType", jsonKey: "username"),
-            ParserMap(ivar: "intType", jsonKey: "user_age"),
-            ParserMap(ivar: "boolType", jsonKey: "active_status")
-        ]
-    }
-}
-
-class TestParserSubClass: PKHParser {
-    var stringType: String = ""
-    var intType: Int = 0
-    var boolType: Bool = false
-}
-
 struct PKHParserTests {
     struct ArrayTests {
-        @Test func testSubClass() {
+        @Test func testSubClass() async throws {
             let dic: [String: Any] = [
                 "arraySubClassType": [
                     [ "stringType": "Alice1",
@@ -66,7 +38,7 @@ struct PKHParserTests {
             #expect(parser.arraySubClassType[2].boolType == true)
         }
 
-        @Test func testCGFloat() {
+        @Test func testCGFloat() async throws {
             let dic: [String: Any] = [
                 "arrayCGFloatType": [1.1,2.2,3.3]
             ]
@@ -79,7 +51,7 @@ struct PKHParserTests {
             #expect(parser.arrayCGFloatType[2] == 3.3)
         }
 
-        @Test func testInt() {
+        @Test func testInt() async throws {
             let dic: [String: Any] = [
                 "arrayIntType": [1,2,3]
             ]
@@ -92,7 +64,7 @@ struct PKHParserTests {
             #expect(parser.arrayIntType[2] == 3)
         }
 
-        @Test func testString() {
+        @Test func testString() async throws {
             let dic: [String: Any] = [
                 "arrayStringType": ["a","b","c"]
             ]
@@ -107,7 +79,7 @@ struct PKHParserTests {
     }
 
     struct InitTests {
-        @Test func testInitAsyncAwait() async {
+        @Test func testInitAsyncAwait() async throws {
             let dic: [String: Any] = [
                 "stringType": "Alice",
                 "intType": 25,
@@ -121,7 +93,7 @@ struct PKHParserTests {
             #expect(obj.boolType == true)
         }
 
-        @Test func testInitAsync() {
+        @Test func testInitAsync() async throws {
             let dic: [String: Any] = [
                 "stringType": "Alice",
                 "intType": 25,
@@ -137,7 +109,7 @@ struct PKHParserTests {
     }
 
     struct setSerializeTests {
-        @Test func testSetSerialize() {
+        @Test func testSetSerialize() async throws {
             let dic: [String: Any] = [
                 "stringType": "Bob",
                 "intType": 30,
@@ -153,7 +125,7 @@ struct PKHParserTests {
             #expect(parser.CGFloatType == 10.5)
         }
 
-        @Test func testGetDataMap() {
+        @Test func testGetDataMap() async throws {
             let dic: [String: Any] = [
                 "username": "Bob",
                 "user_age": 30,
@@ -167,7 +139,7 @@ struct PKHParserTests {
             #expect(parser.boolType == false)
         }
 
-        @Test func testSubClass() {
+        @Test func testSubClass() async throws {
             let dic: [String: Any] = [
                 "classType": [ "stringType": "Alice",
                                "intType": 25,
@@ -179,11 +151,10 @@ struct PKHParserTests {
             #expect(obj.classType?.stringType == "Alice")
             #expect(obj.classType?.intType == 25)
             #expect(obj.classType?.boolType == true)
-
         }
     }
 
-    @Test func testChangeTypeValue() {
+    @Test func testChangeTypeValue() async throws {
         let parser = PKHParser()
 
         #expect(parser.changeTypeValue(type: .string, value: 123) as? String == "123")
@@ -192,7 +163,7 @@ struct PKHParserTests {
         #expect(parser.changeTypeValue(type: .bool, value: "true") as? Bool == true)
     }
 
-    @Test func testDescription() {
+    @Test func testDescription() async throws {
         class TestParser: PKHParser {
             var stringType: String = ""
             var intType: Int = 0
