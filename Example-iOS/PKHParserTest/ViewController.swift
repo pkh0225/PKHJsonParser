@@ -121,7 +121,15 @@ class ViewController: UIViewController {
             print($0)
         }
     }
-    
+
+    @IBAction func onAsyncAwait(_ sender: UIButton) {
+        Task {
+            let dic = jsonString.toDictionary()
+            let obj = await Test.initAsync(map: dic!)
+            print(obj)
+        }
+    }
+
     @IBAction func onToJson(_ sender: UIButton) {
         let dic = jsonString.toDictionary()
         Test.initAsync(map: dic!) {

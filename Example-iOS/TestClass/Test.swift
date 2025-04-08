@@ -8,7 +8,7 @@
 import Foundation
 import PKHJsonParser
 
-class Test : PKHParser { 
+class Test : PKHParser, @unchecked Sendable { 
 
     var widgetData: Widget?
     var windowsList = [[WindowsDataListItem]]()

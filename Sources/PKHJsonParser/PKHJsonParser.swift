@@ -40,9 +40,9 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
     public static func initAsync(map dic: [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil) async -> Self {
         guard let dic = dic else { return Self.init(map: [:]) }
 
-        return await Task {
+//        return await Task {
             return Self.init(map: dic, anyData: anyData, serializeKey: serializeKey)
-        }.value
+//        }.value
     }
 }
 
