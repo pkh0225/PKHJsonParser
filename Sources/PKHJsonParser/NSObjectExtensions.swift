@@ -16,27 +16,7 @@ actor ObjectInfoMap {
     }
 }
 
-final class CacheManager: Sendable {
-    static let shared = CacheManager()
-    nonisolated(unsafe) private var cache = NSCache<NSString, ObjectInfoMap>()
-    private let queue = DispatchQueue(label: "com.cacheManager.queue")
-
-    init() {
-        self.cache.countLimit = 500
-    }
-
-    func setObject(_ obj: ObjectInfoMap, forKey key: String) {
-        self.queue.async(flags: .barrier) {
-            self.cache.setObject(obj, forKey: key as NSString)
-        }
-    }
-
-    func object(forKey key: String) -> ObjectInfoMap? {
-        return self.queue.sync {
-            self.cache.object(forKey: key as NSString)
-        }
-    }
-}
+private let cache = NSCache<NSString, ObjectInfoMap>()
 
 @inline(__always) public func swiftClassFromString(_ className: String, bundleName: String = "") -> AnyClass? {
     func subFunc(className: String, bundleName: String) -> AnyClass? {
@@ -233,13 +213,13 @@ extension NSObject {
 
     @inline(__always) func ivarInfoList() -> [IvarInfo] {
 //        print(String(describing: type(of:self)))
-        if let info = CacheManager.shared.object(forKey: self.className) {
+        if let info = cache.object(forKey: self.className as NSString) {
             return info.ivarInfoList
         }
         else {
             let infoList: [IvarInfo] = getIvarInfoList(type(of: self))
             let info: ObjectInfoMap = ObjectInfoMap(ivarInfoList: infoList )
-            CacheManager.shared.setObject(info, forKey: self.className)
+            cache.setObject(info, forKey: self.className as NSString)
             return infoList
         }
 //        return getIvarInfoList(type(of:self))
