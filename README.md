@@ -13,7 +13,7 @@
 <br>
 
 ## Test
-```
+```swift
 let jsonString = """
 {"widget": {
     "testDebug": "on",
@@ -144,7 +144,7 @@ let jsonString = """
 ## Core Functions
 
 
-```
+```swift
 
 class Test : PKHParser { 
 
