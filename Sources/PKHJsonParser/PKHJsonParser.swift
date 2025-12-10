@@ -64,39 +64,45 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
             self.afterParsed(dic, anyData: anyData)
         }
     }
-    
+
+    open class func addParentData() -> [ParserMap]? { return nil }
     open func getDataMap() -> [ParserMap]? { return nil }
     open func beforeParsed(dic: [String: Any], anyData: Any?) {}
     open func afterParsed(_ dic: [String: Any], anyData: Any?) {}
-    open func setSerialize(map dic: [String: Any], anyData: Any?) {
-        
-        let maps = self.getDataMap()
-        let ivarList = self.ivarInfoList()
+    open func setSerialize(map pDic: [String: Any], anyData: Any?) {
+        let maps: [ParserMap]? = self.getDataMap()
+        let ivarList: [IvarInfo] = self.ivarInfoList()
         for ivarItem in ivarList {
-            var parserMaps = [ParserMap]()
+            var parserMaps: [ParserMap] = [ParserMap]()
             parserMaps.append(ParserMap(ivar: ivarItem.label, jsonKey: ivarItem.label))
-            
-            if let maps = maps {
-                for pm in maps {
+
+            if let maps: [ParserMap] = maps {
+                for pm: ParserMap in maps {
                     if pm.ivar == ivarItem.label {
                         parserMaps.append(pm)
                     }
                 }
             }
-            
-            var data: Any? = nil
-            for map in parserMaps {
-                if let dicValue = dic[map.jsonKey]  {
+
+            var data: Any?
+            for map: ParserMap in parserMaps {
+                if let dicValue = pDic[map.jsonKey] {
                     data = dicValue
                     break
                 }
             }
-//            if ivarItem.label == "enumText" {
-//                print("\(data)")
-//            }
+
             guard let value = data else { continue }
             guard value is NSNull == false else { continue }
-            
+
+//            if self.className == "DI_TSpecialDeal" {
+//                print("\(self.className)")
+//            }
+
+//            if ivarItem.label == "comm" {
+//                print(ivarItem.label)
+//            }
+
             if ivarItem.classType == .array {
                 guard let arrayValue = value as? [Any], arrayValue.count > 0 else { continue }
                 if let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type {
@@ -104,16 +110,30 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                     array.reserveCapacity(arrayValue.count)
                     for arraySubDic in arrayValue {
                         if let dic = arraySubDic as? [String: Any], dic.isEmpty == false {
-                            let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
-                            array.append(addObj)
+                            if let parentDatas = nsobjAbleType.addParentData(), parentDatas.count > 0 {
+                                let addDic = addParentData(nsobjAbleType, parentDic: pDic, subDic: dic)
+                                let addObj = nsobjAbleType.init(map: addDic, anyData: anyData)
+                                array.append(addObj)
+                            }
+                            else {
+                                let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
+                                array.append(addObj)
+                            }
                         }
                         else if let subArray = arraySubDic as? [Any], subArray.count > 0 {
                             var addSubarray: [Any] = []
                             addSubarray.reserveCapacity(subArray.count)
                             for ssDic in subArray {
                                 if let dic = ssDic as? [String: Any], dic.isEmpty == false {
-                                    let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
-                                    addSubarray.append(addObj)
+                                    if let parentDatas = nsobjAbleType.addParentData(), parentDatas.count > 0 {
+                                        let addDic = addParentData(nsobjAbleType, parentDic: pDic, subDic: dic)
+                                        let addObj = nsobjAbleType.init(map: addDic, anyData: anyData)
+                                        addSubarray.append(addObj)
+                                    }
+                                    else {
+                                        let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
+                                        addSubarray.append(addObj)
+                                    }
                                 }
                             }
                             if addSubarray.count > 0 {
@@ -133,23 +153,29 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                     }
                     self.setValue(array, forKey: ivarItem.label)
                 }
-
             }
-            else if ivarItem.classType == .class {
+            else if ivarItem.classType == .dictionary {
                 guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
+                    // PKHParser상속 안받은 놈들은 건너뜀
 //                    assertionFailure("self : [\(self.className)] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
                     continue
                 }
-                if let dic = value as? [String:Any], dic.isEmpty == false {
-                    let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
-                    self.setValue(addObj, forKey: ivarItem.label)
+                if let dic = value as? [String: Any], dic.isEmpty == false {
+                    if let parentDatas = nsobjAbleType.addParentData(), parentDatas.count > 0 {
+                        let addDic = addParentData(nsobjAbleType, parentDic: pDic, subDic: dic)
+                        let addObj = nsobjAbleType.init(map: addDic, anyData: anyData)
+                        self.setValue(addObj, forKey: ivarItem.label)
+                    }
+                    else {
+                        let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
+                        self.setValue(addObj, forKey: ivarItem.label)
+                    }
                 }
             }
-            else if let data = changeTypeValue(type: ivarItem.classType, value: value) {
+            else  if let data = changeTypeValue(type: ivarItem.classType, value: value) {
                 self.setValue(data, forKey: ivarItem.label)
             }
             else if ivarItem.classType == .any {
-//                print("\n debug parser AnyType label: \(ivarItem.label) type: \(String(describing: type(of: value))), value: \(value)\n")
                 self.setValue(value, forKey: ivarItem.label)
             }
             else if ivarItem.classType == .exceptType {
@@ -158,13 +184,12 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
             else {
                 print("""
 
-                      
-                      🧨🧨🧨   파싱 오류입니다.  🧨🧨🧨
-                      lable: \(ivarItem.label)
-                      value: \(value)
-                      
 
-                      """)
+                🧨🧨🧨   파싱 오류입니다.  🧨🧨🧨
+                ClassName: \(self.className), label: \(ivarItem.label), ValueType: \(String(describing: type(of: value)))
+
+
+                """)
 //                self.setValue(value, forKey: ivarItem.label)
             }
         }
@@ -190,6 +215,17 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
             return value is Bool ? value : "\(value)".toBool()
         }
         return nil
+    }
+
+    private func addParentData(_ type: PKHParser.Type, parentDic: [String: Any], subDic: [String: Any]) -> [String: Any] {
+        guard let parentDatas = type.addParentData(), parentDatas.count > 0 else { return subDic }
+        var resultDic = subDic
+        parentDatas.forEach {
+            if let v = parentDic[$0.jsonKey] {
+                resultDic[$0.ivar] = v
+            }
+        }
+        return resultDic
     }
 
     override open var description: String {
