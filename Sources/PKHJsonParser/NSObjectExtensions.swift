@@ -42,7 +42,7 @@ struct  IvarInfo {
     enum IvarInfoClassType: String {
         case any
         case array
-        case dictionary
+        case `class`
         case int
         case string
         case float
@@ -158,7 +158,7 @@ struct  IvarInfo {
             className = className.replace(">", "")
             className = className.replace("ImplicitlyUnwrappedOptional<", "")
             className = className.replace("Optional<", "")
-            ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className)) )
+            ivarDataList.append( IvarInfo(label: label, classType: .`class`, subClassType: swiftClassFromString(className)) )
         }
         else {
             if value is String {
@@ -181,7 +181,7 @@ struct  IvarInfo {
             }
             else {
                 if (Mirror(reflecting: value).displayStyle == .class) {
-                    ivarDataList.append( IvarInfo(label: label, classType: .dictionary, subClassType: swiftClassFromString(className)) )
+                    ivarDataList.append( IvarInfo(label: label, classType: .`class`, subClassType: swiftClassFromString(className)) )
                 }
                 else {
                      ivarDataList.append( IvarInfo(label: label, classType: .exceptType) )
