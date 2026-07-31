@@ -1,383 +1,233 @@
-# PKHParser
+# PKHJsonParser
 
-👻 Easy Parsing JSON to Swift 
+JSON을 Swift 객체로 자동 매핑하는 경량 파서입니다. `PKHParser` 상속만으로 프로퍼티 이름·타입에 맞춰 파싱하고, Codable용 loose 타입 래퍼도 제공합니다.
 
-[![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://swift.org/package-manager/)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://swift.org/package-manager/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Platform](https://img.shields.io/badge/platform-iOS%2012%2B%20%7C%20macOS%2010.15%2B%20%7C%20tvOS%2012%2B-lightgrey.svg)](Package.swift)
 
-## 목표
-> 클라이언트 개발 시 json 파싱 과정에서 생기는 실수를 방지하고 불필요한 반복 작업을 줄여 파싱 과정을 자동화
+## 특징
 
+- **반사 기반 자동 매핑** — `PKHParser`를 상속하고 프로퍼티만 선언하면 JSON 키와 자동 연결
+- **느슨한 타입 변환** — `"123"` → `Int`, `1` → `String`, `"y"` → `Bool` 등
+- **중첩 객체 / 배열** — 서브클래스, `[T]`, `[[T]]`, primitive 배열 지원
+- **키 매핑** — `getDataMap()`으로 JSON 키와 프로퍼티 이름이 다를 때 연결
+- **부모 값 주입** — `addParentData()`로 자식 객체에 부모 JSON 필드 전달
+- **비동기 파싱** — completion / `async-await`
+- **역직렬화** — `toJSON()` / `JSONRepresentation`
+- **Codable 래퍼** — `@LooseInt`, `@LooseString`, `@LooseBool`, `@LooseDouble`, `@LooseFloat`
 
+## 설치
 
+### Swift Package Manager
 
-<br>
-
-## Test
-```swift
-let jsonString = """
-{"widget": {
-    "testDebug": "on",
-     "stringArray": ["a","b","c"],
-    "windowT": {
-        "title": "Sample Konfabulator Widget",
-        "name": "main_window",
-        "width": 500,
-        "height": 500
-    },
-    "testImage": {
-        "src": "Images/Sun.png",
-        "name": "sun1",
-        "hOffset": 250,
-        "vOffset": 250,
-        "alignment": "center"
-    },
-    "testText": {
-        "data": "Click Here",
-        "size": 36,
-        "style": "bold",
-        "name": "text1",
-        "hOffset": 250,
-        "vOffset": 100,
-        "alignment": "center",
-        "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
-    }
-},
-"windowsDataList": [{
-        "title": "Sample Konfabulator Widget",
-        "name": "main_window",
-        "width": 500,
-        "height": 500
-    },
-    {
-        "title": "Sample Konfabulator Widget",
-        "name": "main_window",
-        "width": 500,
-        "height": 500
-    },
-    {
-        "title": "Sample Konfabulator Widget",
-        "name": "main_window",
-        "width": 500,
-        "height": 500
-    }],
-"size": 36,
-"style": "bold",
-"name": "text1",
-"hOffset": 250,
-"vOffset": 100,
-"alignment": "center",
-"onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;"
-}
-"""
-        let dic = jsonString.toDictionary()
-        let obj = Test(map: dic)
-        print(obj)
-        
-        Test.parser(map: dic!) { (obj: Test) in
-            print(obj)
-        }
-
-🎃 RESULT
-======== Test ========
-    windowsList: ---- Array(3) ----
-    [0] ======== WindowsDataListItem ========
-        name: main_window
-        title: Sample Konfabulator Widget
-        height: 500
-        width: 500
-        =======================================
-    [1] ======== WindowsDataListItem ========
-        name: main_window
-        title: Sample Konfabulator Widget
-        height: 500
-        width: 500
-        =======================================
-    [2] ======== WindowsDataListItem ========
-        name: main_window
-        title: Sample Konfabulator Widget
-        height: 500
-        width: 500
-        =======================================
-    ---------------------------
-    widgetData: ======== Widget ========
-        stringArray: ---- Array(3) ----
-        [0] a
-        [1] b
-        [2] c
-        ---------------------------
-        windowT: ======== WindowT ========
-            name: main_window
-            title: Sample Konfabulator Widget
-            height: 500
-            width: 500
-            =======================================
-        testImage: ======== TestImage ========
-            alignment: center
-            name: sun1
-            src: Images/Sun.png
-            hOffset: 250
-            vOffset: 250
-            =======================================
-        testText: ======== TestText ========
-            name: text1
-            data: Click Here
-            onMouseUp: sun1.opacity = (sun1.opacity / 100) * 90;
-            alignment: center
-            size: 36
-            style: bold
-            hOffset: 250
-            vOffset: 100
-            =======================================
-        testDebug: on
-        =======================================
-    onMouseUp: sun1.opacity = (sun1.opacity / 100) * 90;
-    name: text1
-    alignment: center
-    size: 36
-    style: bold
-    hOffset: 250
-    vOffset: 100
-    =======================================
+Xcode: **File → Add Package Dependencies…**
 
 ```
+https://github.com/pkh0225/PKHJsonParser.git
+```
 
-## Core Functions
-
+또는 `Package.swift`:
 
 ```swift
+dependencies: [
+    .package(url: "https://github.com/pkh0225/PKHJsonParser.git", from: "1.3.7")
+]
+```
 
-class Test : PKHParser { 
+## 빠른 시작
 
+```swift
+import PKHJsonParser
+
+@objcMembers
+class User: PKHParser {
+    var name: String = ""
+    var age: Int = 0
+    var isActive: Bool = false
+}
+
+let json = """
+{"name": "Alice", "age": "25", "isActive": "y"}
+"""
+
+guard let dic = json.toDictionary() else { return }
+let user = User(map: dic)
+
+print(user.name)     // "Alice"
+print(user.age)      // 25
+print(user.isActive) // true
+print(user)          // description으로 구조 출력
+```
+
+## 사용법
+
+### 1. 기본 파싱
+
+프로퍼티 이름과 JSON 키가 같으면 별도 설정 없이 매핑됩니다.
+
+지원 타입: `String`, `Int`, `Float`, `CGFloat`, `Double`, `Bool`, `PKHParser` 서브클래스, 위 타입의 배열.
+
+```swift
+@objcMembers
+class WindowT: PKHParser {
+    var title: String = ""
+    var name: String = ""
+    var width: Int = 0
+    var height: Int = 0
+}
+
+@objcMembers
+class Widget: PKHParser {
+    var testDebug: String = ""
+    var stringArray = [String]()
+    var windowT: WindowT?
+}
+
+let dic = jsonString.toDictionary()
+let widget = Widget(map: dic?["widget"] as? [String: Any] ?? [:])
+```
+
+> `@objcMembers`(또는 Objective-C 호환 프로퍼티)가 필요합니다. `NSObject` KVC로 값을 넣기 때문입니다.
+
+### 2. JSON 키 ↔ 프로퍼티 이름 매핑
+
+```swift
+@objcMembers
+class Test: PKHParser {
     var widgetData: Widget?
     var windowsList = [WindowsDataListItem]()
-    var style: String = ""
-    var onMouseUp: String = ""
-    var size: Int = 0
-    var hOffset: Int = 0
-    var vOffset: Int = 0
-    var alignment: String = ""
-    var name: String = ""
 
-    // json key ans ivar Different
     override func getDataMap() -> [ParserMap]? {
-        return [ParserMap(ivar: "windowsList", jsonKey: "windowsDataList"),
-                ParserMap(ivar: "widgetData", jsonKey: "widget")]
+        [
+            ParserMap(ivar: "windowsList", jsonKey: "windowsDataList"),
+            ParserMap(ivar: "widgetData", jsonKey: "widget")
+        ]
     }
-
-    override func beforeParsed(dic: [String : Any], anyData: Any?) {
-        super.beforeParsed(dic: dic, anyData: anyData)
-        
-        // Parsering before
-        
-    }
-    
-    override func afterParsed(_ dic: [String : Any]) {
-        super.afterParsed(dic)
-        
-        // Parsering after
-        
-    }
-}
-
-@objcMembers open class PKHParser: NSObject {
-    
-    public override init() {
-        super.init()
-    }
-    
-    required public init(map dic: [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil) {
-        super.init()
-        guard let dic = dic else { return }
-        self.beforeParsed(dic:dic, anyData:anyData)
-        if let key = serializeKey, let dataDic = dic[key] as? [String: Any] {
-            self.setSerialize(map: dataDic, anyData: anyData)
-            self.afterParsed(dataDic)
-        }
-        else {
-            self.setSerialize(map: dic, anyData: anyData)
-            self.afterParsed(dic)
-        }
-        
-        
-    }
-    
-    open func getDataMap() -> [ParserMap]? { return nil }
-    open func beforeParsed(dic: [String: Any], anyData: Any?) {}
-    open func afterParsed(_ dic: [String: Any]) {}
-    open func setSerialize(map dic: [String: Any], anyData: Any?) {
-        
-        let maps = self.getDataMap()
-        let ivarList = self.ivarInfoList()
-        for ivarItem in ivarList {
-            var changeKey = ivarItem.label
-            var parserMap: ParserMap?
-            if let maps = maps {
-                for pm in maps {
-                    if pm.ivar == ivarItem.label {
-                        parserMap = pm
-                        break;
-                    }
-                }
-            }
-            if parserMap != nil && parserMap!.jsonKey != "" {
-                changeKey = parserMap!.jsonKey
-            }
-            
-//            print(changeKey)
-            guard let value = dic[changeKey] else { continue }
-            guard value is NSNull == false else { continue }
-            
-            if ivarItem.classType == .array {
-                guard let arrayValue = value as? [Any], arrayValue.count > 0 else { continue }
-                guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
-                    fatalError("self : [\(String(describing: self))] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
-                    continue
-                }
-                var array: [Any] = []
-                array.reserveCapacity(arrayValue.count)
-                for arraySubDic in arrayValue {
-                    if let dic = arraySubDic as? [String:Any] {
-                        let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
-                        array.append(addObj)
-                    }
-                    
-                }
-                self.setValue(array, forKey: ivarItem.label)
-            }
-            else if ivarItem.classType == .dictionary {
-                guard let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type else {
-                    fatalError("self : [\(String(describing: self))] label : \(ivarItem.label)  \(String(describing: ivarItem.subClassType)) not NSObject" )
-                    continue
-                }
-                if let dic = value as? [String:Any], dic.keys.count > 0 {
-                    let addObj = nsobjAbleType.init(map: dic, anyData: anyData)
-                    self.setValue(addObj, forKey: ivarItem.label)
-                }
-            }
-            else if ivarItem.classType == .string {
-                if value is String {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    self.setValue("\(value)", forKey: ivarItem.label)
-                }
-                
-            }
-            else if ivarItem.classType == .int {
-                if value is Int {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    let text = "\(value)"
-                    self.setValue(text.toInt(), forKey: ivarItem.label)
-                }
-            }
-            else if ivarItem.classType == .float {
-                if value is Float {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    let text = "\(value)"
-                    self.setValue(text.toFloat(), forKey: ivarItem.label)
-                }
-            }
-            else if ivarItem.classType == .bool {
-                if value is Bool {
-                    self.setValue(value, forKey: ivarItem.label)
-                }
-                else {
-                    let text = "\(value)"
-                    self.setValue(text.toBool(), forKey: ivarItem.label)
-                }
-            }
-            else {
-                self.setValue(value, forKey: ivarItem.label)
-            }
-            
-            
-        }
-        
-        
-    }
-    
-    open override var description: String {
-        return getDescription()
-    }
-    
-    private enum descriptionType {
-        case `default`
-        case array
-        case subInstance
-    }
-    
-    private func getDescription(_ tapCount: UInt = 0, _ addType: descriptionType = .default) -> String {
-        var tap = ""
-        for _ in 0...tapCount { tap += "\t" }
-        var result: [String] = []
-        let ivarList = self.toDictionary()
-        result.reserveCapacity(ivarList.count)
-        switch addType {
-        case .default:
-            result.append("\n\(tap)✏️ ======== \(self.className) ✏️ ========")
-        case .array:
-            result.append("⬇️ --- \(self.className) ⬇️ ---")
-        case .subInstance:
-            result.append("➡️ --- \(self.className) ➡️ ---")
-        }
-        
-        for (key, value) in ivarList {
-            //            print("label: \(key), class: \(self.className) value: \(value)")
-            
-            
-            if let arrayValue = value as? [Any] {
-                result.append("\(key): ---- Array(\(arrayValue.count)) -------------------------------")
-                for (idx,obj) in arrayValue.enumerated() {
-                    if checkObjectClass(obj) {
-                        result.append("[\(idx)] \(obj)")
-                    }
-                    else {
-                        if let subArray = obj as? [Any] {
-                            result.append("[\(idx)]---- SubArray(\(subArray.count)) ----")
-                            for case let (subIdx,subItem as PKHParser) in subArray.enumerated() {
-                                result.append("\t[\(subIdx)] \(subItem.getDescription(tapCount + 1, .array))")
-                            }
-                            result.append("---------------------------")
-                        }
-                        else if let objClass = obj as? PKHParser {
-                            result.append("[\(idx)] \(objClass.getDescription(tapCount + 1, .array))")
-                        }
-                        else {
-                            result.append("[\(idx)] \(String(describing: type(of: value))) ????????")
-                            //                                assertionFailure("\(String(describing: value)) not NSObject" )
-                        }
-                    }
-                }
-                if arrayValue.count > 0 {
-                    result.append("------------------------------------------------------")
-                }
-                
-            }
-            else if checkObjectClass(value as AnyObject) {
-                result.append("\(key): \(value)")
-            }
-            else {
-                if let objClass = value as? PKHParser {
-                    result.append("\(key): \(objClass.getDescription(tapCount + 1, .subInstance))")
-                }
-                else {
-                    result.append("\(key): \(String(describing: type(of: value))) ????????")
-                    //                        assertionFailure("\(String(describing: value)) not NSObject" )
-                }
-            }
-        }
-        switch addType {
-        case .default:
-            result.append("✏️ ================== \(self.className) ===================== ✏️")
-        case .array, .subInstance:
-            result.append("----------- \(self.className)  -----------")
-        }
-        return result.joined(separator: "\n\(tap)")
-    }
-    
 }
 ```
+
+### 3. 파싱 전/후 훅
+
+```swift
+override func beforeParsed(dic: [String: Any], anyData: Any?) {
+    // setSerialize 이전
+}
+
+override func afterParsed(_ dic: [String: Any], anyData: Any?) {
+    // setSerialize 이후 — 가공·검증 등
+}
+```
+
+`anyData`로 파싱 컨텍스트를 함께 넘길 수 있습니다.
+
+```swift
+let obj = User(map: dic, anyData: context)
+```
+
+특정 키 아래 dictionary만 파싱하려면 `serializeKey`를 사용합니다.
+
+```swift
+let obj = User(map: responseDic, serializeKey: "data")
+```
+
+### 4. 부모 JSON 값을 자식에 주입
+
+자식 클래스에서 `addParentData()`를 오버라이드하면, 배열/중첩 객체 생성 시 부모 dictionary의 값을 자식에 넣습니다.
+
+```swift
+@objcMembers
+class Item: PKHParser {
+    var id: String = ""
+    var parentId: String = ""
+
+    open override class func addParentData() -> [ParserMap]? {
+        [ParserMap(ivar: "parentId", jsonKey: "id")]
+    }
+}
+```
+
+### 5. 비동기 파싱
+
+```swift
+// completion (백그라운드 파싱 → 메인에서 콜백)
+Test.initAsync(map: dic) { obj in
+    print(obj)
+}
+
+// async/await
+Task {
+    let obj = await Test.initAsync(map: dic)
+    print(obj)
+}
+```
+
+### 6. 객체 → JSON
+
+`PKHParser`는 `JSONSerializable`을 구현합니다.
+
+```swift
+let obj = Test(map: dic)
+print(obj.toJSON() ?? "")
+print(obj.JSONRepresentation)
+```
+
+### 7. Codable용 Loose 프로퍼티 래퍼
+
+타입이 들쭉날쭉한 API를 `Codable`로 받을 때 사용합니다.
+
+```swift
+struct Product: Codable {
+    @LooseInt var productId: Int
+    @LooseString var productName: String
+    @LooseDouble var price: Double
+    @LooseBool var isOnSale: Bool
+    @LooseFloat var discount: Float
+}
+
+// product_id가 "1001", is_on_sale이 "y"여도 디코딩 성공
+let product = try JSONDecoder().decode(Product.self, from: data)
+```
+
+| 래퍼 | 허용 입력 예 |
+|------|-------------|
+| `@LooseBool` | `true` / `"y"`, `"yes"`, `"true"` / `1` |
+| `@LooseString` | 문자열 / 숫자 / Bool → 문자열 |
+| `@LooseInt` | Int / `"123"` / Double(절사) |
+| `@LooseDouble` | Double / `"67.89"` / Int |
+| `@LooseFloat` | Float / 문자열 / Int |
+
+## String 헬퍼
+
+```swift
+"{\"a\":1}".toDictionary()  // [String: Any]?
+"123".toInt()               // 123
+"3.14".toFloat()            // 3.14
+"3.14".toDouble()
+"3.14".toCGFloat()
+"y".toBool()                // true
+"  hello  ".trim()
+```
+
+## 예제 앱
+
+`Example-iOS`에 샘플 모델과 UI가 있습니다. 동기/비동기 파싱, `toJSON()` 동작을 확인할 수 있습니다.
+
+```
+Example-iOS/
+├── PKHParserTest/     # 앱 타깃
+└── TestClass/         # Sample 모델 (Test, Widget, …)
+```
+
+## 요구 사항
+
+| 항목 | 버전 |
+|------|------|
+| Swift | 5.5+ |
+| iOS | 12.0+ |
+| macOS | 10.15+ |
+| tvOS | 12.0+ |
+
+## 라이선스
+
+[MIT](LICENSE) © 박길호
