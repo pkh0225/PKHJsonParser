@@ -8,7 +8,7 @@
 
 import Foundation
 
-actor ObjectInfoMap {
+class ObjectInfoMap {
     let ivarInfoList: [IvarInfo]
 
     init(ivarInfoList: [IvarInfo]) {
