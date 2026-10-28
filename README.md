@@ -1,6 +1,6 @@
 # PKHJsonParser
 
-JSON을 Swift 객체로 자동 매핑하는 경량 파서입니다. `PKHParser` 상속만으로 프로퍼티 이름·타입에 맞춰 파싱하고, Codable용 loose 타입 래퍼도 제공합니다.
+JSON을 Swift 객체로 자동 매핑하는 경량 파서입니다. `PKHParser` 상속만으로 프로퍼티 이름·타입에 맞춰 파싱합니다.
 
 [![SwiftPM compatible](https://img.shields.io/badge/SwiftPM-compatible-brightgreen.svg)](https://swift.org/package-manager/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -15,7 +15,6 @@ JSON을 Swift 객체로 자동 매핑하는 경량 파서입니다. `PKHParser` 
 - **부모 값 주입** — `addParentData()`로 자식 객체에 부모 JSON 필드 전달
 - **비동기 파싱** — completion / `async-await`
 - **역직렬화** — `toJSON()` / `JSONRepresentation`
-- **Codable 래퍼** — `@LooseInt`, `@LooseString`, `@LooseBool`, `@LooseDouble`, `@LooseFloat`
 
 ## 설치
 
@@ -171,31 +170,6 @@ let obj = Test(map: dic)
 print(obj.toJSON() ?? "")
 print(obj.JSONRepresentation)
 ```
-
-### 7. Codable용 Loose 프로퍼티 래퍼
-
-타입이 들쭉날쭉한 API를 `Codable`로 받을 때 사용합니다.
-
-```swift
-struct Product: Codable {
-    @LooseInt var productId: Int
-    @LooseString var productName: String
-    @LooseDouble var price: Double
-    @LooseBool var isOnSale: Bool
-    @LooseFloat var discount: Float
-}
-
-// product_id가 "1001", is_on_sale이 "y"여도 디코딩 성공
-let product = try JSONDecoder().decode(Product.self, from: data)
-```
-
-| 래퍼 | 허용 입력 예 |
-|------|-------------|
-| `@LooseBool` | `true` / `"y"`, `"yes"`, `"true"` / `1` |
-| `@LooseString` | 문자열 / 숫자 / Bool → 문자열 |
-| `@LooseInt` | Int / `"123"` / Double(절사) |
-| `@LooseDouble` | Double / `"67.89"` / Int |
-| `@LooseFloat` | Float / 문자열 / Int |
 
 ## String 헬퍼
 
