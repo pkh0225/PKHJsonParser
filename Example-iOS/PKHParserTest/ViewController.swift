@@ -99,7 +99,8 @@ class ViewController: UIViewController {
         "vOffset": 100,
         "alignment": "center",
         "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;",
-        "boolTest": true
+        "boolTest": true,
+        "boolTestNil": true
     }
     """
 

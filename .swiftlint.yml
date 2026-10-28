@@ -1,0 +1,154 @@
+# ==============================================================================
+# 1. 검사 대상 디렉토리 및 파일 필터 (Directory and file filters)
+# ==============================================================================
+
+# 린트 검사를 실행할 대상 경로 (PKHJsonParser)
+included:
+  - Sources
+
+# 린트 검사에서 제외할 대상 경로
+excluded:
+  - Script
+  - Tests
+  - Example-iOS
+  - Example
+  - .build
+  - .swiftpm
+
+# ==============================================================================
+# 2. 규칙 활성화 목록 (Enabled/disabled rules)
+# ==============================================================================
+
+# Xcode 빌드 분석기(Analyzer) 단계에서 실행할 강력한 정적 분석 규칙
+analyzer_rules:
+  - unused_declaration       # 선언만 되고 사용되지 않는 코드(클래스, 함수, 변수 등) 감지
+  - unused_import            # 코드에서 실제 사용되지 않는 import 구문 감지
+
+# 지정한 규칙들만 선택적으로 검사하는 화이트리스트 방식 적용
+only_rules:
+  - closing_brace            # 닫는 중괄호와 괄호 사이에 불필요한 공백 금지
+  - colon                    # 타입 선언 및 딕셔너리 키에서 콜론(:) 위치 규칙 (선언문 바로 뒤에 붙이고 1칸 공백)
+  - comma                    # 쉼표(,) 앞 공백 금지 및 쉼표 뒤 1칸 공백 강제
+  - comment_spacing          # 주석 기호(//) 뒤에 최소 1칸의 공백 사용 권장
+  - control_statement        # if, guard, for, switch 등의 조건문 괄호 생략 유도
+  - empty_enum_arguments     # 연관값(Associated Value)을 갖는 enum 매칭 시 미사용 인자 생략 유도
+  - empty_parameters         # 클로저/함수 타입 표기 시 Void -> 대신 () -> 사용 유도
+  - empty_parentheses_with_trailing_closure # 트레일링 클로저 사용 시 메서드 뒤 빈 괄호() 생략
+  - leading_whitespace       # 파일 시작 부분의 불필요한 공백/줄바꿈 금지
+  - legacy_cggeometry_functions # CGGeometry 레거시 C 함수 대신 구조체 속성/메서드 사용 (예: CGRectGetMinX -> rect.minX)
+  - legacy_constant          # 레거시 전역 상수 대신 구조체 스코프 상수 사용 (예: CGPointZero -> .zero)
+  - legacy_constructor       # 레거시 생성 함수 대신 Swift 생성자 표현식 사용 (예: CGSizeMake -> CGSize)
+  - legacy_nsgeometry_functions # NSGeometry 레거시 C 함수 대신 구조체 속성/메서드 사용
+  - no_space_in_method_call  # 메서드 이름과 호출 괄호() 사이 공백 금지
+  - opening_brace            # 여는 중괄호({) 앞에 공백 1칸 배치 및 동일한 줄에 선언 강제
+  - private_over_fileprivate # fileprivate 대신 private 선언 사용 유도
+  - protocol_property_accessors_order # 프로토콜 프로퍼티 접근자 선언 순서를 'get set'으로 통일
+  - redundant_discardable_let # 함수 반환값 버릴 때 let _ = foo() 대신 _ = foo() 사용
+  - redundant_objc_attribute # 불필요하거나 중복된 @objc 속성 제거
+  - implicit_optional_initialization # 옵셔널 변수를 nil로 명시적 초기화하지 않도록 강제 (let/var x: Int? = nil 금지)
+  - redundant_void_return    # 함수 선언부의 불필요한 -> Void 반환 타입 표기 생략
+  - return_arrow_whitespace  # 반환 타입 화살표(->) 앞뒤 공백 1칸 강제
+  - statement_position       # else 및 catch 키워드의 위치 규칙 (아래 세부 설정과 연동)
+  - syntactic_sugar          # 축약 표현식 사용 권장 (예: Array<Int> 대신 [Int], Optional<String> 대신 String?)
+  - trailing_comma           # 배열/딕셔너리 리터럴의 요소 뒤 쉼표 처리 규칙
+  - trailing_newline         # 파일 맨 끝에 단 하나의 빈 줄(Newline)만 포함하도록 강제
+  - trailing_semicolon       # 문장 끝 세미콜론(;) 사용 금지
+  - trailing_whitespace      # 코드 줄 끝의 불필요한 공백 금지 (아래 세부 설정 참조)
+  - unused_closure_parameter # 클로저 내에서 사용되지 않는 파라미터는 _ 로 대체
+  - unused_control_flow_label # 사용되지 않는 제어 흐름 라벨(loop label 등) 제거
+  - void_return              # 반환 타입 표기 시 -> () 대신 -> Void 사용 권장
+  - weak_delegate            # 순환 참조 방지를 위해 Delegate 프로퍼티에 weak 키워드 강제
+  - closure_end_indentation  # 클로저가 시작된 줄의 들여쓰기와 닫는 중괄호(}) 들여쓰기 일치
+  - closure_spacing          # 클로저 중괄호 내부 양끝 공백 1칸 강제 ({ code } 형태)
+  - literal_expression_end_indentation # 배열/딕셔너리 리터럴의 닫는 괄호 들여쓰기 일치
+  - modifier_order           # 접근 제어자 및 모디파이어 순서 일관성 유지 (예: override public -> public override)
+  - operator_usage_whitespace # 연산자 앞뒤 공백 1칸 강제
+  - prefer_self_type_over_type_of_self # 동적 타입 확인 시 type(of: self) 대신 Self 사용 권장
+  - prefer_zero_over_explicit_init # CGPoint(x: 0, y: 0) 같은 명시적 초기화 대신 .zero 사용 권장
+  - duplicate_imports        # 중복된 import 구문 제거
+  - vertical_whitespace_opening_braces # 여는 중괄호({) 바로 다음 줄에 빈 줄 추가 금지
+
+# ==============================================================================
+#  신규 추가 - 나중에 하나씩 풀면서 더 적용해야 함
+# ==============================================================================
+  - mark                     # // MARK: - 주석 형식을 올바르게 준수하도록 강제
+  - unowned_variable_capture # 클로저 내 해제된 메모리 참조로 인한 크래시 위험(unowned)을 감지하여 weak 사용 유도
+  - first_where              # .filter { ... }.first 대신 성능상 유익한 .first(where:) 사용 강제
+  - last_where               # .filter { ... }.last 대신 성능상 유익한 .last(where:) 사용 강제
+  - contains_over_filter_is_empty # .filter { ... }.isEmpty 대신 탐색을 즉시 멈추는 .contains(where:) 사용 유도
+  - contains_over_first_not_nil   # .filter { ... }.first != nil 대신 .contains(where:) 사용 유도
+  - contains_over_filter_count    # .filter { ... }.count > 0 대신 .contains(where:) 사용 유도
+  - sorted_first_last        # .sorted().first/last 대신 min()/max() 사용 유도
+  - array_init               # seq.map { $0 } 대신 Array(seq) 사용 유도
+  - reduce_into              # 배열/딕셔너리/문자열 누적 시 복사 비용이 없는 reduce(into:_:) 사용 유도
+  - reduce_boolean           # Bool 결과에는 reduce 대신 contains/allSatisfy 사용
+  - redundant_nil_coalescing # x ?? nil 같은 무의미한 nil 병합 제거
+  - discarded_notification_center_observer # NotificationCenter 옵저버를 변수에 담지 않고 버려 미해제되는 경우 감지
+  - legacy_multiple          # x % 2 == 0 대신 Swift 5 표현법인 x.isMultiple(of: 2) 사용 유도
+  - toggle_bool              # flag = !flag 대신 flag.toggle() 메서드 사용 유도
+  - identical_operands       # a == a, a - a 등 동일한 피연산자를 비교/연산하는 실수 코드 감지
+  - vertical_whitespace_closing_braces # 닫는 중괄호(}) 바로 앞 줄에 빈 줄 추가 금지
+  - empty_count              # .count == 0 대신 .isEmpty 사용 유도
+  - empty_string             # == "" / .count == 0 대신 .isEmpty 사용 유도
+#  - prefer_self_in_static_references # ClassName.foo 대신 Self.foo 사용 유도
+#  - prefer_key_path          # { $0.name } 대신 (\.name) 키패스 사용 유도
+  - shorthand_optional_binding # if let self = self 대신 if let self 축약 바인딩 사용 유도
+  - unused_optional_binding  # if let x = x 등에서 바인딩한 값을 사용하지 않으면 감지 제거 유도
+  - unhandled_throwing_task  # Task 블록 내에서 try 호출 시 do-catch 에러 처리 누락 방지
+#  - for_where                # for문 내부 전체를 감싸는 단일 if문을 for ... where절로 통합 유도
+  - duplicate_enum_cases     # enum 케이스를 중복 선언하지 않음
+  - prohibited_super_call    # 호출하면 안 되는 메서드에서는 super를 호출하지 않음
+  - overridden_super_call    # 재정의한 메서드에서 super 호출 누락 방지
+  - unavailable_condition    # #available/#unavailable을 분기 방향에 맞게 사용
+  - self_in_property_initialization # 프로퍼티 초기값에서 self 참조 금지 (필요시 lazy 사용)
+  - force_try                # try! 대신 안전한 에러 처리 사용
+#  - unused_setter_value      # setter에서는 newValue를 사용해야 함
+  - return_value_from_void_function # Void 함수에서 값을 반환하지 않음
+#  - class_delegate_protocol  # 델리게이트 프로토콜은 weak 참조 가능하도록 class 전용으로 선언
+  - computed_accessors_order # 연산 프로퍼티는 get을 먼저, set을 나중에 선언
+  - legacy_hashing           # hashValue 대신 hash(into:)를 재정의
+  - legacy_random            # arc4random 계열 대신 타입의 random(in:) 사용
+  - redundant_type_annotation # 타입 추론이 가능한 경우 불필요한 타입 명시 금지
+# - attributes               # 속성/애트리뷰트(@기호) 줄바꿈 배치 규칙 (비활성화)
+# - unneeded_override        # 부모 클래스의 동작 변경 없이 super만 호출하는 불필요한 override 금지 (비활성화)
+
+
+
+
+# ==============================================================================
+# 3. 규칙별 세부 설정 (Configurations)
+# ==============================================================================
+
+# 애트리뷰트 규칙 설정 (비활성화)
+# attributes:
+#   always_on_line_above:
+#     - "nonisolated"
+#     - "@OptionGroup"
+#     - "@RuleConfigurationDescriptionBuilder"
+#     - "@fluentSetterMacro"
+#     - "@UserDefault"
+#     - "#WeakSelfClosure"
+
+# 줄 끝 공백 규칙 설정
+trailing_whitespace:
+  ignores_empty_lines: true  # 텍스트 없이 탭/공백만 있는 빈 줄은 경고를 띄우지 않음 (코드 뒤 붙은 공백만 검사)
+  ignores_comments: true     # 주석(//) 뒤에 붙은 공백은 무시함
+
+# 불필요한 타입 표기 규칙 설정
+#redundant_type_annotation:
+#  consider_default_literal_types_redundant: true # let count: Int = 0, let name: String = "" 같은 리터럴 타입 명시도 중복으로 봄
+
+
+# 불필요한 override 규칙 설정 (비활성화)
+# unneeded_override:
+#   affect_initializers: true
+
+# 미사용 import 규칙 예외 설정
+unused_import:
+  always_keep_imports:      # 컴파일 타임 구문 분석 문제로 사용 여부 감지가 어려운 모듈을 유지 대상으로 지정
+    - SwiftSyntaxBuilder
+    - SwiftLintFramework
+
+# 구문 위치 규칙: else / catch 키워드 배치 옵션
+statement_position:
+  statement_mode: uncuddled_else # 닫는 중괄호(}) 뒤에 줄바꿈을 하여 else/catch를 다음 줄로 내려서 작성하도록 강제

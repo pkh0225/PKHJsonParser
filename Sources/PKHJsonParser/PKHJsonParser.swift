@@ -11,7 +11,7 @@ import Foundation
 public struct ParserMap {
     var ivar: String
     var jsonKey: String
-    
+
     public init(ivar: String, jsonKey: String) {
         self.ivar = ivar
         self.jsonKey = jsonKey
@@ -39,20 +39,19 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
 
     @concurrent
     public static func initAsync(map dic: [String: Any]?, anyData: Any? = nil, serializeKey: String? = nil) async -> Self {
-        guard let dic = dic else { return Self.init(map: [:]) }
+        guard let dic else { return Self.init(map: [:]) }
         return Self.init(map: dic, anyData: anyData, serializeKey: serializeKey)
     }
 }
 
-
 @objcMembers open class PKHParser: NSObject, JSONSerializable, ParserAsyncInitProtocal {
-    public override init() {
+    override public init() {
         super.init()
     }
-    
-    required public init(map dic: [String: Any], anyData: Any? = nil, serializeKey: String? = nil) {
+
+    public required init(map dic: [String: Any], anyData: Any? = nil, serializeKey: String? = nil) {
         super.init()
-        self.beforeParsed(dic:dic, anyData:anyData)
+        self.beforeParsed(dic: dic, anyData: anyData)
         if let key = serializeKey, let dataDic = dic[key] as? [String: Any] {
             self.setSerialize(map: dataDic, anyData: anyData)
             self.afterParsed(dataDic, anyData: anyData)
@@ -71,10 +70,10 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
         let maps: [ParserMap]? = self.getDataMap()
         let ivarList: [IvarInfo] = self.ivarInfoList()
         for ivarItem in ivarList {
-            var parserMaps: [ParserMap] = [ParserMap]()
+            var parserMaps = [ParserMap]()
             parserMaps.append(ParserMap(ivar: ivarItem.label, jsonKey: ivarItem.label))
 
-            if let maps: [ParserMap] = maps {
+            if let maps {
                 for pm: ParserMap in maps {
                     if pm.ivar == ivarItem.label {
                         parserMaps.append(pm)
@@ -102,13 +101,13 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
 //            }
 
             if ivarItem.classType == .array {
-                guard let arrayValue = value as? [Any], arrayValue.count > 0 else { continue }
+                guard let arrayValue = value as? [Any], !arrayValue.isEmpty else { continue }
                 if let nsobjAbleType = ivarItem.subClassType as? PKHParser.Type {
                     var array: [Any] = []
                     array.reserveCapacity(arrayValue.count)
                     for arraySubDic in arrayValue {
                         if let dic = arraySubDic as? [String: Any], dic.isEmpty == false {
-                            if let parentDatas = nsobjAbleType.addParentData(), parentDatas.count > 0 {
+                            if let parentDatas = nsobjAbleType.addParentData(), !parentDatas.isEmpty {
                                 let addDic = addParentData(nsobjAbleType, parentDic: pDic, subDic: dic)
                                 let addObj = nsobjAbleType.init(map: addDic, anyData: anyData)
                                 array.append(addObj)
@@ -118,12 +117,12 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                                 array.append(addObj)
                             }
                         }
-                        else if let subArray = arraySubDic as? [Any], subArray.count > 0 {
+                        else if let subArray = arraySubDic as? [Any], !subArray.isEmpty {
                             var addSubarray: [Any] = []
                             addSubarray.reserveCapacity(subArray.count)
                             for ssDic in subArray {
                                 if let dic = ssDic as? [String: Any], dic.isEmpty == false {
-                                    if let parentDatas = nsobjAbleType.addParentData(), parentDatas.count > 0 {
+                                    if let parentDatas = nsobjAbleType.addParentData(), !parentDatas.isEmpty {
                                         let addDic = addParentData(nsobjAbleType, parentDic: pDic, subDic: dic)
                                         let addObj = nsobjAbleType.init(map: addDic, anyData: anyData)
                                         addSubarray.append(addObj)
@@ -134,7 +133,7 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                                     }
                                 }
                             }
-                            if addSubarray.count > 0 {
+                            if !addSubarray.isEmpty {
                                 array.append(addSubarray)
                             }
                         }
@@ -159,7 +158,7 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                     continue
                 }
                 if let dic = value as? [String: Any], dic.isEmpty == false {
-                    if let parentDatas = nsobjAbleType.addParentData(), parentDatas.count > 0 {
+                    if let parentDatas = nsobjAbleType.addParentData(), !parentDatas.isEmpty {
                         let addDic = addParentData(nsobjAbleType, parentDic: pDic, subDic: dic)
                         let addObj = nsobjAbleType.init(map: addDic, anyData: anyData)
                         self.setValue(addObj, forKey: ivarItem.label)
@@ -170,8 +169,13 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                     }
                 }
             }
-            else  if let data = changeTypeValue(type: ivarItem.classType, value: value) {
-                self.setValue(data, forKey: ivarItem.label)
+            else if let data = changeTypeValue(type: ivarItem.classType, value: value) {
+                if ivarItem.isOptional {
+                    setOptionalBasicValue(data, for: ivarItem)
+                }
+                else {
+                    self.setValue(data, forKey: ivarItem.label)
+                }
             }
             else if ivarItem.classType == .any {
                 self.setValue(value, forKey: ivarItem.label)
@@ -215,8 +219,37 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
         return nil
     }
 
+    /// Int?/Bool? 등 값 타입 Optional은 ObjC KVC 불가 → ivar에 직접 기록. String?만 KVC 사용.
+    private func setOptionalBasicValue(_ data: Any, for ivarItem: IvarInfo) {
+        let key = ivarItem.label
+        switch ivarItem.classType {
+        case .string:
+            self.setValue(data, forKey: key)
+        case .int:
+            setOptionalIvarValue(self, key: key, value: data as? Int)
+        case .bool:
+            setOptionalIvarValue(self, key: key, value: data as? Bool)
+        case .float:
+            setOptionalIvarValue(self, key: key, value: data as? Float)
+        case .cgfloat:
+            if let v = data as? CGFloat {
+                setOptionalIvarValue(self, key: key, value: Optional(v))
+            }
+            else if let v = data as? Double {
+                setOptionalIvarValue(self, key: key, value: Optional(CGFloat(v)))
+            }
+            else if let v = data as? Float {
+                setOptionalIvarValue(self, key: key, value: Optional(CGFloat(v)))
+            }
+        case .double:
+            setOptionalIvarValue(self, key: key, value: data as? Double)
+        default:
+            self.setValue(data, forKey: key)
+        }
+    }
+
     private func addParentData(_ type: PKHParser.Type, parentDic: [String: Any], subDic: [String: Any]) -> [String: Any] {
-        guard let parentDatas = type.addParentData(), parentDatas.count > 0 else { return subDic }
+        guard let parentDatas = type.addParentData(), !parentDatas.isEmpty else { return subDic }
         var resultDic = subDic
         parentDatas.forEach {
             if let v = parentDic[$0.jsonKey] {
@@ -250,13 +283,13 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
         }
 
         for (label, value) in mirrored_object.children {
-            guard let label = label else { continue }
+            guard let label else { continue }
             if value is String || value is Int || value is Float || value is CGFloat || value is Double || value is Bool {
                 result.append("\(label) : \(value)")
             }
             else if let objList = value as? [[PKHParser]] {
                 var strList = [String]()
-                if objList.count > 0 {
+                if !objList.isEmpty {
                     for (idx, obj) in objList.enumerated() {
                         strList.append("[\(idx)]")
                         for (idx, subObj) in obj.enumerated() {
@@ -272,12 +305,11 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                 else {
                     result.append("\(label) : ⬇️ --- count = 0 ⬇️ ------")
                 }
-
             }
             else if let objList = value as? [PKHParser] {
                 var strList = [String]()
 
-                if objList.count > 0 {
+                if !objList.isEmpty {
                     for (idx, obj) in objList.enumerated() {
                         strList.append("[\(idx)] \(obj.getDescription(tapCount + 1, mirrored_object: Mirror(reflecting: obj)))")
                     }
@@ -288,7 +320,6 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
                 else {
                     result.append("\(label) : ⬇️ --- count = 0 ⬇️ ------")
                 }
-
             }
             else if let objList = value as? [String] {
                 var strList = [String]()
@@ -312,12 +343,11 @@ extension ParserAsyncInitProtocal where Self: PKHParser {
 
         return result.joined(separator: "\n\(tap)")
     }
-    
 }
 
 extension Array {
     public subscript(safe index: Int?) -> Element? {
-        guard let index = index else { return nil }
+        guard let index else { return nil }
         if indices.contains(index) {
             return self[index]
         }

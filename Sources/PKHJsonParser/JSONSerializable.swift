@@ -15,7 +15,7 @@ extension JSONSerializable {
     public var JSONRepresentation: [String: Any] {
         var representation: [String: Any] = [String: Any]()
 
-        let mirrored_object: Mirror = Mirror(reflecting: self)
+        let mirrored_object = Mirror(reflecting: self)
 
         representation = getMirrorToDic(mirrored_object: mirrored_object)
 
@@ -26,7 +26,6 @@ extension JSONSerializable {
         var representation: [String: Any] = [String: Any]()
 
         for case let (label?, value) in mirrored_object.children {
-
             let mir = Mirror(reflecting: value)
             if mir.displayStyle == .enum {
                 let valueArray = "\(value)".split(separator: ".")
@@ -39,7 +38,7 @@ extension JSONSerializable {
                     var addArray = [Any]()
                     for item in value {
                         if let subArray: [JSONSerializable] = item as? [JSONSerializable] {
-                            var addSubArray: [[String: Any]] = [[String: Any]]()
+                            var addSubArray = [[String: Any]]()
                             for subItem: JSONSerializable in subArray {
                                 let dic = subItem.JSONRepresentation
                                 if dic.isEmpty == false {
@@ -49,7 +48,6 @@ extension JSONSerializable {
                             if addSubArray.isEmpty == false {
                                 addArray.append(addSubArray)
                             }
-
                         }
                         else if let item = item as? NSNumber {
                             addArray.append(item)
@@ -109,10 +107,8 @@ extension JSONSerializable {
                     representation.updateValue(v, forKey: k)
                 }
             }
-
         }
         return representation
-
     }
 }
 
@@ -142,5 +138,4 @@ extension Optional: JSONSerializable {
         }
         return [String: Any]()
     }
-
 }

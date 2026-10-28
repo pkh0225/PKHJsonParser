@@ -33,3 +33,12 @@ class TestParserSubClass: PKHParser {
 class TestSuperParser: PKHParser {
     var superVar: String = "1234"
 }
+
+class OptionalBasicParser: PKHParser {
+    var stringType: String?
+    var intType: Int?
+    var boolType: Bool?
+    var floatType: Float?
+    var cgfloatType: CGFloat?
+    var doubleType: Double?
+}

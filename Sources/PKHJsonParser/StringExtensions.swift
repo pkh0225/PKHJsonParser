@@ -62,4 +62,3 @@ extension String {
         return try? JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
     }
 }
-

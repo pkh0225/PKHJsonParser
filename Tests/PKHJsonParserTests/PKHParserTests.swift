@@ -152,6 +152,25 @@ struct PKHParserTests {
             #expect(obj.classType?.intType == 25)
             #expect(obj.classType?.boolType == true)
         }
+
+        @Test func testOptionalBasicTypes() async throws {
+            let dic: [String: Any] = [
+                "stringType": "Alice",
+                "intType": 25,
+                "boolType": true,
+                "floatType": Float(1.5),
+                "cgfloatType": CGFloat(2.5),
+                "doubleType": 3.5
+            ]
+
+            let obj = OptionalBasicParser(map: dic)
+            #expect(obj.stringType == "Alice")
+            #expect(obj.intType == 25)
+            #expect(obj.boolType == true)
+            #expect(obj.floatType == 1.5)
+            #expect(obj.cgfloatType == 2.5)
+            #expect(obj.doubleType == 3.5)
+        }
     }
 
     @Test func testChangeTypeValue() async throws {

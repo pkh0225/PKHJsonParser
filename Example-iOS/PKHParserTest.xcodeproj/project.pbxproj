@@ -25,6 +25,7 @@
 
 /* Begin PBXFileReference section */
 		20AE480928AB8B5C00EFBC9A /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
+		26D13FBA98254158B19729F3 /* swiftlint_korean.awk */ = {isa = PBXFileReference; lastKnownFileType = text; path = swiftlint_korean.awk; sourceTree = "<group>"; };
 		52C9905626C0B2FD009F3453 /* PKHParserTest.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PKHParserTest.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		52C9905926C0B2FD009F3453 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		52C9905B26C0B2FD009F3453 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -39,6 +40,8 @@
 		52C9909426C0B390009F3453 /* WindowT.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WindowT.swift; sourceTree = "<group>"; };
 		52C9909526C0B390009F3453 /* TestText.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TestText.swift; sourceTree = "<group>"; };
 		52C9909626C0B390009F3453 /* Widget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Widget.swift; sourceTree = "<group>"; };
+		77E9AFB88D4548B0A652B382 /* .swiftlint.yml */ = {isa = PBXFileReference; lastKnownFileType = text.yaml; name = .swiftlint.yml; path = ../.swiftlint.yml; sourceTree = "<group>"; };
+		9D9AF1EC05DE407381A27778 /* SwiftLint.sh */ = {isa = PBXFileReference; lastKnownFileType = text.script.sh; path = SwiftLint.sh; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -63,6 +66,8 @@
 		52C9904D26C0B2FD009F3453 = {
 			isa = PBXGroup;
 			children = (
+				77E9AFB88D4548B0A652B382 /* .swiftlint.yml */,
+				A612A170060541E98EF593AC /* Script */,
 				20AE480928AB8B5C00EFBC9A /* README.md */,
 				52C9909026C0B390009F3453 /* TestClass */,
 				52C9905826C0B2FD009F3453 /* PKHParserTest */,
@@ -106,6 +111,24 @@
 			path = TestClass;
 			sourceTree = "<group>";
 		};
+		A612A170060541E98EF593AC /* Script */ = {
+			isa = PBXGroup;
+			children = (
+				AAC5CF8CFBEE4DE4A06807EA /* lint */,
+			);
+			name = Script;
+			sourceTree = "<group>";
+		};
+		AAC5CF8CFBEE4DE4A06807EA /* lint */ = {
+			isa = PBXGroup;
+			children = (
+				9D9AF1EC05DE407381A27778 /* SwiftLint.sh */,
+				26D13FBA98254158B19729F3 /* swiftlint_korean.awk */,
+			);
+			name = lint;
+			path = ../Script/lint;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -116,6 +139,7 @@
 				52C9905226C0B2FD009F3453 /* Sources */,
 				52C9905326C0B2FD009F3453 /* Frameworks */,
 				52C9905426C0B2FD009F3453 /* Resources */,
+				21795C1E24EC4A85B43E71C0 /* Run Script : Swiftlint */,
 			);
 			buildRules = (
 			);
@@ -174,6 +198,28 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		21795C1E24EC4A85B43E71C0 /* Run Script : Swiftlint */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Run Script : Swiftlint";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# SwiftLint + 한글 워닝\n/bin/sh \"${SRCROOT}/../Script/lint/SwiftLint.sh\" \"${SRCROOT}/..\"\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		52C9905226C0B2FD009F3453 /* Sources */ = {
@@ -338,7 +384,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LW3F5LSN8X;
 				INFOPLIST_FILE = PKHParserTest/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -358,7 +404,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = LW3F5LSN8X;
 				INFOPLIST_FILE = PKHParserTest/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 16;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

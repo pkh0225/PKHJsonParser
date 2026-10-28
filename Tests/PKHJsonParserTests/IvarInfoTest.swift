@@ -208,6 +208,86 @@ struct IvarInfoTest {
         #expect(IvarInfo.IvarInfoClassType(string: "abc") == .exceptType)
     }
 
+    struct TestOptionalBasic {
+        @Test func testOptionalString() async throws {
+            class TestParserClass: NSObject {
+                var a: String?
+            }
+            let ivarInfos = getIvarInfoList(TestParserClass.self)
+            let iVarInfo = try #require(ivarInfos.first)
+            #expect(iVarInfo.label == "a")
+            #expect(iVarInfo.classType == .string)
+            #expect(iVarInfo.isOptional == true)
+            #expect(iVarInfo.subClassType == nil)
+            #expect(iVarInfo.subValueType == .exceptType)
+        }
+
+        @Test func testOptionalInt() async throws {
+            class TestParserClass: NSObject {
+                var a: Int?
+            }
+            let ivarInfos = getIvarInfoList(TestParserClass.self)
+            let iVarInfo = try #require(ivarInfos.first)
+            #expect(iVarInfo.label == "a")
+            #expect(iVarInfo.classType == .int)
+            #expect(iVarInfo.isOptional == true)
+            #expect(iVarInfo.subClassType == nil)
+            #expect(iVarInfo.subValueType == .exceptType)
+        }
+
+        @Test func testOptionalBool() async throws {
+            class TestParserClass: NSObject {
+                var a: Bool?
+            }
+            let ivarInfos = getIvarInfoList(TestParserClass.self)
+            let iVarInfo = try #require(ivarInfos.first)
+            #expect(iVarInfo.label == "a")
+            #expect(iVarInfo.classType == .bool)
+            #expect(iVarInfo.isOptional == true)
+            #expect(iVarInfo.subClassType == nil)
+            #expect(iVarInfo.subValueType == .exceptType)
+        }
+
+        @Test func testOptionalFloat() async throws {
+            class TestParserClass: NSObject {
+                var a: Float?
+            }
+            let ivarInfos = getIvarInfoList(TestParserClass.self)
+            let iVarInfo = try #require(ivarInfos.first)
+            #expect(iVarInfo.label == "a")
+            #expect(iVarInfo.classType == .float)
+            #expect(iVarInfo.isOptional == true)
+            #expect(iVarInfo.subClassType == nil)
+            #expect(iVarInfo.subValueType == .exceptType)
+        }
+
+        @Test func testOptionalCGFloat() async throws {
+            class TestParserClass: NSObject {
+                var a: CGFloat?
+            }
+            let ivarInfos = getIvarInfoList(TestParserClass.self)
+            let iVarInfo = try #require(ivarInfos.first)
+            #expect(iVarInfo.label == "a")
+            #expect(iVarInfo.classType == .cgfloat)
+            #expect(iVarInfo.isOptional == true)
+            #expect(iVarInfo.subClassType == nil)
+            #expect(iVarInfo.subValueType == .exceptType)
+        }
+
+        @Test func testOptionalDouble() async throws {
+            class TestParserClass: NSObject {
+                var a: Double?
+            }
+            let ivarInfos = getIvarInfoList(TestParserClass.self)
+            let iVarInfo = try #require(ivarInfos.first)
+            #expect(iVarInfo.label == "a")
+            #expect(iVarInfo.classType == .double)
+            #expect(iVarInfo.isOptional == true)
+            #expect(iVarInfo.subClassType == nil)
+            #expect(iVarInfo.subValueType == .exceptType)
+        }
+    }
+
     @Test func testBool() async throws {
         class TestParserClass: PKHParser {
             var x: Bool = true

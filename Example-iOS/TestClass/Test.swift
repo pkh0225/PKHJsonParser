@@ -20,6 +20,7 @@ class Test : PKHParser, @unchecked Sendable {
     var alignment: String = ""
     var name: String = ""
     var boolTest: Bool = false
+    var boolTestNil: Bool?
 
     // json key ans ivar Different
     override func getDataMap() -> [ParserMap]? {
